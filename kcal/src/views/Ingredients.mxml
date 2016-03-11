@@ -18,13 +18,12 @@
 			import views.scripts.Model;
 			
 			private var connection:SQLConnection;
-			private var model:Model;
+			private var model:Model = Model.getInstance();
 			
 			[Bindable]
 			private var listData:ArrayCollection;
 			
 			private function init():void{		
-				model = Model.getInstance();
 				selectItems();
 			}
 			private function selectItems():void{

@@ -2,7 +2,7 @@
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark"
 		xmlns:mx="library://ns.adobe.com/flex/mx"
-		title="Ingredients Edit" creationComplete="init();">
+		title="Ingredients Edit">
 	<fx:Script>
 		<![CDATA[
 			import flash.data.SQLConnection;
@@ -14,11 +14,7 @@
 			import views.scripts.Model;
 			
 			private var connection:SQLConnection;
-			private var model:Model;
-			
-			private function init():void{		
-				model = Model.getInstance();
-			}
+			private var model:Model = Model.getInstance();
 			
 			//-----------------------------------------------------------------
 			private function onSave():void {
@@ -76,8 +72,8 @@
 		</fx:Array>
 	</fx:Declarations>
 	<s:VGroup left="2" top="2">
-		<s:Label styleName="title" text="{Model.getInstance().ingredientStatus['operation'] + ' Ingredient'}"/>
-		<s:HGroup><s:Label text="Category"/><s:TextInput id="t_fkcatname" text="{data.fkcatname}" change="onChange()" focusIn="selectCategory(event)" width="250"/></s:HGroup>
+		<s:Label styleName="title" text="{model.ingredientStatus['operation'] + ' Ingredient'}"/>
+		<s:HGroup><s:Label text="Category"/><s:TextInput id="t_fkcatname" text="{model.categoryColumn['fkcatname']}" change="onChange()" focusIn="selectCategory(event)" width="250"/></s:HGroup>
 		<s:HGroup><s:Label text="Name"/><s:TextInput id="t_ingname" text="{data.ingname}" change="onChange()" width="250"/></s:HGroup>
 		<s:HGroup><s:Label text="Unit"/><s:TextInput id="t_fkunitname" text="{data.fkunitname}" change="onChange()" focusIn="selectUnit(event)" width="50"/></s:HGroup>
 		<s:HGroup><s:Label text="Kcal/Unit"/><s:TextInput id="t_unitkcal" text="{data.unitkcal}" change="onChange()" width="100"/></s:HGroup>

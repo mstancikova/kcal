@@ -2,7 +2,7 @@
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark"
 		xmlns:mx="library://ns.adobe.com/flex/mx"
-		title="Units" creationComplete="init();">
+		title="Units">
 	<fx:Script>
 		<![CDATA[
 			import flash.data.SQLConnection;
@@ -14,11 +14,7 @@
 			import views.scripts.Model;
 			
 			private var connection:SQLConnection;
-			private var model:Model;
-			
-			private function init():void{		
-				model = Model.getInstance();
-			}
+			private var model:Model = Model.getInstance();
 		
 			//------------------------------------------------------------------------
 			private function onSave():void {
@@ -63,7 +59,7 @@
 		</fx:Array>
 	</fx:Declarations>
 	<s:VGroup left="2" top="2">
-		<s:Label styleName="title" text="{Model.getInstance().unitStatus['operation'] + ' Unit'}"/>
+		<s:Label styleName="title" text="{model.unitStatus['operation'] + ' Unit'}"/>
 		<s:HGroup><s:Label text="Name"/><s:TextInput id="t_unitname" text="{data.unitname}" change="onChange()" width="250"/></s:HGroup>
 		<s:HGroup><s:Label text="Description"/><s:TextInput id="t_unitdesc" text="{data.unitdesc}" change="onChange()" width="250"/></s:HGroup>
 		<s:HGroup>
