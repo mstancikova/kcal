@@ -33,6 +33,8 @@
 			private function init():void{		
 				model = Model.getInstance();
 				selectItems();
+				
+				
 			}
 			
 			
