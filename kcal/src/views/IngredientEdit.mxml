@@ -6,58 +6,38 @@
 	<fx:Script>
 		<![CDATA[
 			import flash.data.SQLConnection;
-			import flash.data.SQLMode;
 			import flash.data.SQLResult;
-			import flash.data.SQLStatement;
-			import flash.events.SQLEvent;
-			import flash.filesystem.File;
 			import flash.net.Responder;
 			
-			import mx.collections.ArrayCollection;
-			import mx.utils.ObjectProxy;
 			import mx.validators.Validator;
 			
+			import views.scripts.Model;
+			
 			private var connection:SQLConnection;
+			private var model:Model;
 			
-			[Bindable]
-			private var listData:ArrayCollection;
+			private function init():void{		
+				model = Model.getInstance();
+			}
 			
-			private function init():void{
-				var dbFile:File = File.applicationDirectory.resolvePath("db/kcal_01.db");
-				var dbWorkFile:File = File.documentsDirectory.resolvePath("kcal_01.db");
-				//var dbFile:File = File.applicationStorageDirectory.resolvePath("kcal_01.db");
-				connection = new SQLConnection();
-				connection.addEventListener(SQLEvent.OPEN, onOpen);
-				connection.openAsync(dbFile, SQLMode.CREATE);
-				
-				if(data){
-					trace("fromView: " + data.fromView);
-					if(data.fromView == "C" || data.fromView == "U"){
-						b_save.enabled = true;
-					}
-				}
-			}
-			protected function onError(event:SQLErrorEvent):void{
-				trace(event.text);
-			}
-			private function onOpen(evt:SQLEvent):void{
-				var stat:SQLStatement = new SQLStatement();
-				stat.sqlConnection = connection;
-				stat.text = "CREATE TABLE IF NOT EXISTS INGREDIENT (id INTEGER PRIMARY KEY AUTOINCREMENT, ingname TEXT, fkcatname TEXT, fkunitname TEXT, unitkcal DECIMAL(5, 2))";
-				connection.addEventListener(SQLErrorEvent.ERROR, onError);
-				stat.execute();
-			}		
+			//-----------------------------------------------------------------
 			private function onSave():void {
-				if(fieldsCheck()){
-					var stat:SQLStatement = new SQLStatement();
-					stat.sqlConnection = connection;
-					stat.parameters["@ingname"] = t_ingname.text;
-					stat.parameters["@fkcatname"] = t_fkcatname.text;
-					stat.parameters["@fkunitname"] = t_fkunitname.text;
-					stat.parameters["@unitkcal"] = t_unitkcal.text;
-					stat.text = "UPDATE INGREDIENT SET ingname=@ingname, fkcatname=@fkcatname, fkunitname=@fkunitname, unitkcal=@unitkcal WHERE id=" + data.id_ingredient;
-					stat.addEventListener(SQLErrorEvent.ERROR, onError);
-					stat.execute(-1, new Responder(fatto));
+				if(fieldsCheck()){				
+					var obj:Object = new Object();
+					if(model.ingredientStatus['operation'] == 'New'){
+						obj["@ingname"] = t_ingname.text;
+						obj["@fkcatname"] = t_fkcatname.text;
+						obj["@fkunitname"] = t_fkunitname.text;
+						obj["@unitkcal"] = t_unitkcal.text;
+						model.getIngredients().Create(obj, new Responder(fatto));
+					}else{
+						obj["@id_ingredient"] = data.id_ingredient;
+						obj["@ingname"] = t_ingname.text;
+						obj["@fkcatname"] = t_fkcatname.text;
+						obj["@fkunitname"] = t_fkunitname.text;
+						obj["@unitkcal"] = t_unitkcal.text;
+						model.getIngredients().Update(obj, new Responder(fatto));
+					}
 				}
 			}
 			private function onChange():void {
@@ -65,14 +45,6 @@
 			}
 			private function fatto(evt:SQLResult):void{
 				navigator.pushView(Ingredients, data);
-				/*if(data.fromView == "I" || data.fromView == "C"){
-					trace(data.fromView);
-					data.fromView = "IE"
-					navigator.pushView(Ingredients, data);
-				}else if(data.fromView == "D-DN-I"){
-					data.fromView = "D-DN-I-IE"
-					navigator.pushView(Ingredients, data);
-				}*/
 			}
 			private function clearFields():void {
 				t_ingname.text = t_fkcatname.text = t_fkunitname.text = t_unitkcal.text = "";
@@ -87,21 +59,9 @@
 				}
 			}
 			private function selectCategory(event:FocusEvent):void{
-				//var tmpObj:ObjectProxy = new ObjectProxy();
-				//data.id_ingredient = data.id_ingredient;
-				data.ingname = t_ingname.text;
-				data.fkunitname = t_fkunitname.text;
-				data.unitkcal = t_unitkcal.text;
-				data.fromView = "IE";
 				navigator.pushView(Categories, data);
 			}
 			private function selectUnit(event:FocusEvent):void{
-				//var tmpObj:ObjectProxy = new ObjectProxy();
-				//data.id_ingredient = data.id_ingredient;
-				data.ingname = t_ingname.text;
-				data.fkcatname = t_fkcatname.text;
-				data.unitkcal = t_unitkcal.text;
-				data.fromView = "IE";
 				navigator.pushView(Units, data);
 			}
 
@@ -116,7 +76,7 @@
 		</fx:Array>
 	</fx:Declarations>
 	<s:VGroup left="2" top="2">
-		<!--<s:Label text="From view"/><s:TextInput text="{data.fromView}" editable="false"/>-->
+		<s:Label styleName="title" text="{Model.getInstance().ingredientStatus['operation'] + ' Ingredient'}"/>
 		<s:HGroup><s:Label text="Category"/><s:TextInput id="t_fkcatname" text="{data.fkcatname}" change="onChange()" focusIn="selectCategory(event)" width="250"/></s:HGroup>
 		<s:HGroup><s:Label text="Name"/><s:TextInput id="t_ingname" text="{data.ingname}" change="onChange()" width="250"/></s:HGroup>
 		<s:HGroup><s:Label text="Unit"/><s:TextInput id="t_fkunitname" text="{data.fkunitname}" change="onChange()" focusIn="selectUnit(event)" width="50"/></s:HGroup>

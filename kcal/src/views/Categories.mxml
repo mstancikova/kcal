@@ -9,54 +9,28 @@
 	<fx:Script>
 		  <![CDATA[
 			  import flash.data.SQLConnection;
-			  import flash.data.SQLMode;
 			  import flash.data.SQLResult;
-			  import flash.data.SQLStatement;
-			  import flash.events.SQLEvent;
-			  import flash.filesystem.File;
-			  import flash.net.Responder;
-			  
+			  import flash.net.Responder;		
 			  import mx.collections.ArrayCollection;
 			  import mx.core.FlexGlobals;
 			  import mx.utils.ObjectProxy;
+			  import views.scripts.Model;
 			  
 			  private var connection:SQLConnection;
+			  private var model:Model;
 			  
 			  [Bindable]
 			  private var listData:ArrayCollection;
 			  
-			  private function init():void{
-				  var dbFile:File = File.applicationDirectory.resolvePath("db/kcal_01.db");
-				  var dbWorkFile:File = File.documentsDirectory.resolvePath("kcal_01.db");
-				  //var dbFile:File = File.applicationStorageDirectory.resolvePath("kcal_01.db");
-				  connection = new SQLConnection();
-				  connection.addEventListener(SQLEvent.OPEN, onOpen);
-				  connection.openAsync(dbFile, SQLMode.CREATE);
-				  
-				 /* if(data){
-					  trace("fromView: " + data.fromView);
-					  if(data.fromView == "IE"){
-						  b_select.enabled = true;
-					  }
-				  }*/
+			  private function init():void{		
+				  model = Model.getInstance();
+				  selectItems();
 			  }
-			  protected function onError(event:SQLErrorEvent):void{
-				  trace(event.text);
+			  private function selectItems():void{
+				  model.getCategories().selectItems(new Responder(onSelected));
 			  }
-			  private function onOpen(evt:SQLEvent):void{
-				  var stat:SQLStatement = new SQLStatement();
-				  stat.sqlConnection = connection;
-				  stat.text = "CREATE TABLE IF NOT EXISTS CATEGORY (id INTEGER PRIMARY KEY AUTOINCREMENT, catname TEXT)";
-				  connection.addEventListener(SQLErrorEvent.ERROR, onError);
-				  stat.execute(-1, new Responder(selectItems));
-			  }
-			  private function selectItems(evt:SQLResult):void{
-				  var stat:SQLStatement = new SQLStatement();
-				  stat.sqlConnection = connection;
-				  stat.text = "SELECT * FROM CATEGORY ORDER BY catname";
-				  connection.addEventListener(SQLErrorEvent.ERROR, onError);
-				  stat.execute( -1, new Responder(onSelected));
-			  }
+			  
+			  //-------------------------------------------------------------------------
 			  private function onSelected(evt:SQLResult):void {
 				  listData = new ArrayCollection(evt.data);
 			  }
@@ -64,32 +38,35 @@
 				  return evt.catname;
 			  }
 			  private function doNew():void {
-				  navigator.pushView(CategoriesNew);
+				  model.categoriesStatus["operation"] = "New";
+				  navigator.pushView(CategoriesEdit);
 			  }
 			  private function doEdit():void {
+				  model.categoriesStatus["operation"] = "Edit";
 				  var tmpObj:ObjectProxy = new ObjectProxy();
 				  tmpObj.id_category = categoriesList.selectedItem.id;
 				  tmpObj.catname = categoriesList.selectedItem.catname;
-				  tmpObj.fromView = "C";
 				  navigator.pushView(CategoriesEdit, tmpObj);
 			  }
 			  private function doSelect():void {
-				  if(data){
+			  
+				  model.categoryColumn['fkcatname'] == categoriesList.selectedItem.catname;
+				  navigator.pushView(IngredientEdit, data);
+				  
+				  /*if(data){
 					  data.fkcatname = categoriesList.selectedItem.catname;
-					  if(data.fromView == "IE"){
-						  data.fromView = "C";
-						  navigator.pushView(IngredientEdit, data);
-					  }else if(data.fromView == "IN"){
-						  data.fromView = "C";
-						  navigator.pushView(IngredientNew, data);
-					  }
-				  }
+					  navigator.pushView(IngredientEdit, data);
+				  }else{
+					  var tmpObj:ObjectProxy = new ObjectProxy();
+					  tmpObj.fkcatname = categoriesList.selectedItem.catname;
+					  navigator.pushView(IngredientEdit, data);
+				  }*/
 			  }
 			  private function doDelete():void {
-				  var stat:SQLStatement = new SQLStatement();
-				  stat.sqlConnection = connection;
-				  stat.text = "DELETE FROM CATEGORY WHERE id=" + categoriesList.selectedItem.id;
-				  stat.execute( -1, new Responder(selectItems));
+				  var obj:Object = new Object();
+				  obj["@id_category"] = categoriesList.selectedItem.id;
+				  model.getCategories().Delete(obj);
+				  navigator.pushView(Categories);
 			  }
 			  
 			  

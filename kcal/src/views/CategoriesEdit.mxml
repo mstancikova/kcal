@@ -2,62 +2,42 @@
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark"
 		xmlns:mx="library://ns.adobe.com/flex/mx"
-		title="Categories Edit" creationComplete="init();">
+		title="Categories" creationComplete="init();">
 	<fx:Script>
 		<![CDATA[
 			import flash.data.SQLConnection;
-			import flash.data.SQLMode;
 			import flash.data.SQLResult;
-			import flash.data.SQLStatement;
-			import flash.events.SQLEvent;
-			import flash.filesystem.File;
 			import flash.net.Responder;
 			
-			import mx.collections.ArrayCollection;
 			import mx.validators.Validator;
 			
+			import views.scripts.Model;
+			
 			private var connection:SQLConnection;
+			private var model:Model;
 			
-			[Bindable]
-			private var listData:ArrayCollection;
+			private function init():void{		
+				model = Model.getInstance();
+			}
 			
-			private function init():void{
-				var dbFile:File = File.applicationDirectory.resolvePath("db/kcal_01.db");
-				var dbWorkFile:File = File.documentsDirectory.resolvePath("kcal_01.db");
-				//var dbFile:File = File.applicationStorageDirectory.resolvePath("kcal_01.db");
-				connection = new SQLConnection();
-				connection.addEventListener(SQLEvent.OPEN, onOpen);
-				connection.openAsync(dbFile, SQLMode.CREATE);
-				
-				if(data){
-					trace("fromView: " + data.fromView);
-				}
-			}
-			protected function onError(event:SQLErrorEvent):void{
-				trace(event.text);
-			}
-			private function onOpen(evt:SQLEvent):void{
-				var stat:SQLStatement = new SQLStatement();
-				stat.sqlConnection = connection;
-				stat.text = "CREATE TABLE IF NOT EXISTS CATEGORY (id INTEGER PRIMARY KEY AUTOINCREMENT, catname TEXT)";
-				connection.addEventListener(SQLErrorEvent.ERROR, onError);
-				stat.execute();
-			}		
+			//------------------------------------------------------------------------	
 			private function onSave():void {
-				if(fieldsCheck()){
-					var stat:SQLStatement = new SQLStatement();
-					stat.sqlConnection = connection;
-					stat.parameters["@catname"] = t_catname.text;
-					stat.text = "UPDATE CATEGORY SET catname=@catname WHERE id=" + data.id_category;
-					stat.addEventListener(SQLErrorEvent.ERROR, onError);
-					stat.execute(-1, new Responder(fatto));
+				if(fieldsCheck()){				
+					var obj:Object = new Object();
+					if(model.categoriesStatus['operation'] == 'New'){
+						obj["@catname"] = t_catname.text;
+						model.getCategories().Create(obj, new Responder(fatto));
+					}else{
+						obj["@id_category"] = data.id_category;
+						obj["@catname"] = t_catname.text;
+						model.getCategories().Update(obj, new Responder(fatto));
+					}
 				}
 			}
 			private function onChange():void {
 				b_save.enabled = true;
 			}
 			private function fatto(evt:SQLResult):void{
-				data.fromView = "CE";
 				navigator.pushView(Categories, data);
 			}
 			private function clearFields():void {
@@ -72,8 +52,6 @@
 					return true;
 				}
 			}
-			
-			
 		]]>
 	</fx:Script>
 	<fx:Declarations>
@@ -82,7 +60,7 @@
 		</fx:Array>
 	</fx:Declarations>
 	<s:VGroup left="2" top="2">
-		<!--<s:Button id="b_back" label="&lt;&lt;" click="backToChooseUnits(event)" />-->
+		<s:Label styleName="title" text="{Model.getInstance().categoriesStatus['operation'] + ' Category'}"/>
 		<s:HGroup><s:Label text="Name"/><s:TextInput id="t_catname" text="{data.catname}" change="onChange()" width="250"/></s:HGroup>
 		<s:HGroup>
 			<s:Button id="b_save" label="Save changes" enabled="false" click="onSave();" />

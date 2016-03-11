@@ -3,6 +3,7 @@
 
 s|Button {fontSize: 12pt; font-weight:normal;}
 s|Label {fontSize: 12pt; padding-top:15px;}
+.title{color:#003366; fontWeight:bold; textAlign:center;}
 
 /* Change padding for all DateSpinner controls */
 s|SpinnerListItemRenderer {

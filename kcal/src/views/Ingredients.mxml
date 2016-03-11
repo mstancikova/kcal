@@ -9,56 +9,29 @@
 	<fx:Script>
 		<![CDATA[
 			import flash.data.SQLConnection;
-			import flash.data.SQLMode;
 			import flash.data.SQLResult;
 			import flash.data.SQLStatement;
-			import flash.events.SQLEvent;
-			import flash.filesystem.File;
-			import flash.net.Responder;
-			
+			import flash.net.Responder;		
 			import mx.collections.ArrayCollection;
 			import mx.core.FlexGlobals;
 			import mx.utils.ObjectProxy;
+			import views.scripts.Model;
 			
 			private var connection:SQLConnection;
+			private var model:Model;
 			
 			[Bindable]
 			private var listData:ArrayCollection;
 			
-			private function init():void{
-				var dbFile:File = File.applicationDirectory.resolvePath("db/kcal_01.db");
-				var dbWorkFile:File = File.documentsDirectory.resolvePath("kcal_01.db");
-				//var dbFile:File = File.applicationStorageDirectory.resolvePath("kcal_01.db");
-				connection = new SQLConnection();
-				connection.addEventListener(SQLEvent.OPEN, onOpen);
-				connection.openAsync(dbFile, SQLMode.CREATE);
-				
-				/*if(data){
-					trace("fromView: " + data.fromView);
-					if(data.fromView == "DN" || data.fromView == "D-DN" || data.fromView == "D-DN-I-IE"){
-						b_select.enabled = true;
-					}
-				}*/
-				
+			private function init():void{		
+				model = Model.getInstance();
+				selectItems();
 			}
-			protected function onError(event:SQLErrorEvent):void{
-				trace(event.text);
+			private function selectItems():void{
+				model.getIngredients().selectItems(new Responder(onSelected));
 			}
 			
-			private function onOpen(evt:SQLEvent):void{
-				var stat:SQLStatement = new SQLStatement();
-				stat.sqlConnection = connection;
-				stat.text = "CREATE TABLE IF NOT EXISTS INGREDIENT (id INTEGER PRIMARY KEY AUTOINCREMENT, ingname TEXT, fkcatname TEXT, fkunitname TEXT, unitkcal DECIMAL(5, 2))";
-				connection.addEventListener(SQLErrorEvent.ERROR, onError);
-				stat.execute(-1, new Responder(selectItems));
-			}
-			private function selectItems(evt:SQLResult):void{
-				var stat:SQLStatement = new SQLStatement();
-				stat.sqlConnection = connection;
-				stat.text = "SELECT * FROM INGREDIENT ORDER BY ingname";
-				connection.addEventListener(SQLErrorEvent.ERROR, onError);
-				stat.execute( -1, new Responder(onSelected));
-			}
+			//------------------------------------------------------------------------
 			private function onSelected(evt:SQLResult):void {
 				listData = new ArrayCollection(evt.data);
 			}
@@ -67,23 +40,17 @@
 			}
 			
 			private function doNew():void {
-				var tmpObj:ObjectProxy = new ObjectProxy();
-				tmpObj.fromView = "I";
-				navigator.pushView(IngredientNew);
+				model.ingredientStatus["operation"] = "New";
+				navigator.pushView(IngredientEdit);
 			}
 			private function doEdit():void {
+				model.ingredientStatus["operation"] = "Edit";
 				var tmpObj:ObjectProxy = new ObjectProxy();
 				tmpObj.id_ingredient = ingredientsList.selectedItem.id;
 				tmpObj.ingname = ingredientsList.selectedItem.ingname;
 				tmpObj.fkcatname = ingredientsList.selectedItem.fkcatname;
 				tmpObj.fkunitname = ingredientsList.selectedItem.fkunitname;
 				tmpObj.unitkcal = ingredientsList.selectedItem.unitkcal;
-				tmpObj.fromView = "I";
-				if(data){
-					if(data.fromView == "D-DN"){
-						tmpObj.fromView = "D-DN-I";
-					}
-				}
 				navigator.pushView(IngredientEdit, tmpObj);
 			}
 			private function doSelect():void {
@@ -91,15 +58,15 @@
 					data.dwhat = ingredientsList.selectedItem.ingname;
 					data.iunitkcal = ingredientsList.selectedItem.unitkcal;
 					data.unitname = ingredientsList.selectedItem.fkunitname;
-					data.fromView = "D-DN-I";
 					navigator.pushView(DiaryNew, data);
 				}
 			}
+			
 			private function doDelete():void {
-				var stat:SQLStatement = new SQLStatement();
-				stat.sqlConnection = connection;
-				stat.text = "DELETE FROM INGREDIENT WHERE id=" + ingredientsList.selectedItem.id;
-				stat.execute( -1, new Responder(selectItems));
+				var obj:Object = new Object();
+				obj["@id_ingredient"] = ingredientsList.selectedItem.id;
+				model.getCategories().Delete(obj);
+				navigator.pushView(Categories);
 			}
 			
 		]]>

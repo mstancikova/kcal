@@ -1,27 +1,25 @@
 package views.scripts
 {
-	
+
 	import flash.data.SQLConnection;
 	import flash.data.SQLMode;
-	import flash.data.SQLResult;
-	import flash.data.SQLStatement;
 	import flash.events.SQLErrorEvent;
-	import flash.events.SQLEvent;
 	import flash.filesystem.File;
-	import flash.net.Responder;
-	
-	import views.scripts.Functions;
 
 	public class Model extends Object
-	{
-		
+	{	
 		private static var _instance:Model;
-		
 		private var connection:SQLConnection;
 		
+		public var unitStatus:Object = new Object();
+		public var categoriesStatus:Object = new Object();
+		public var categoryColumn:Object = new Object();
+		public var ingredientStatus:Object = new Object();
+		
 		private var diary:Diary;
-		
-		
+		private var units:Units;
+		private var categories:Categories;
+		private var ingredients:Ingredients;
 				
 		public function Model()
 		{
@@ -39,30 +37,41 @@ package views.scripts
 			return _instance;
 		}		
 		
-		
-		
 		private function init():void{		
 			var dbFile:File = File.applicationDirectory.resolvePath("db/kcal_01.db");
 			var dbWorkFile:File = File.documentsDirectory.resolvePath("kcal_01.db");
-			//var dbFile:File = File.applicationStorageDirectory.resolvePath("kcal_01.db");
 			connection = new SQLConnection();
 			connection.open(dbFile, SQLMode.CREATE);
 			connection.addEventListener(SQLErrorEvent.ERROR, onError);
 			
-			
 			//open tables
 			diary = new Diary(connection);
+			units = new Units(connection);
+			categories = new Categories(connection);
+			ingredients = new Ingredients(connection);
 		}
 		protected function onError(event:SQLErrorEvent):void{
 			trace(event.text);
 		}
+
 		
-		
+		// tables
 		public function getDiary() : Diary
 		{
 			return diary;
 		}
-		
+		public function getUnits() : Units
+		{
+			return units;
+		}
+		public function getCategories() : Categories
+		{
+			return categories;
+		}
+		public function getIngredients() : Ingredients
+		{
+			return ingredients;
+		}
 		
 		
 		
