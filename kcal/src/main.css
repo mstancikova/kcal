@@ -1,0 +1,14 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+
+s|Button {fontSize: 12pt; font-weight:normal;}
+s|Label {fontSize: 12pt; padding-top:15px;}
+
+/* Change padding for all DateSpinner controls */
+s|SpinnerListItemRenderer {
+	paddingTop: 7;
+	paddingBottom: 7;
+	paddingLeft: 5;
+	paddingRight: 5;
+	fontSize: 12;
+}

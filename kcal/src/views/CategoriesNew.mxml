@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		xmlns:mx="library://ns.adobe.com/flex/mx"
+		title="Categories News" creationComplete="init();">
+	<fx:Script>
+		<![CDATA[
+			import flash.data.SQLConnection;
+			import flash.data.SQLMode;
+			import flash.data.SQLResult;
+			import flash.data.SQLStatement;
+			import flash.events.SQLEvent;
+			import flash.filesystem.File;
+			import flash.net.Responder;
+			
+			import mx.collections.ArrayCollection;
+			import mx.validators.Validator;
+			
+			private var connection:SQLConnection;
+			
+			[Bindable]
+			private var listData:ArrayCollection;
+			
+			private function init():void{
+				var dbFile:File = File.applicationDirectory.resolvePath("db/kcal_01.db");
+				var dbWorkFile:File = File.documentsDirectory.resolvePath("kcal_01.db");
+				//var dbFile:File = File.applicationStorageDirectory.resolvePath("kcal_01.db");
+				connection = new SQLConnection();
+				connection.addEventListener(SQLEvent.OPEN, onOpen);
+				connection.openAsync(dbFile, SQLMode.CREATE);
+			}
+			protected function onError(event:SQLErrorEvent):void{
+				trace(event.text);
+			}
+			private function onOpen(evt:SQLEvent):void{
+				var stat:SQLStatement = new SQLStatement();
+				stat.sqlConnection = connection;
+				stat.text = "CREATE TABLE IF NOT EXISTS CATEGORY (id INTEGER PRIMARY KEY AUTOINCREMENT, catname TEXT)";
+				connection.addEventListener(SQLErrorEvent.ERROR, onError);
+				stat.execute();
+			}		
+			private function onCreate():void {
+				if(fieldsCheck()){
+					var stat:SQLStatement = new SQLStatement();
+					stat.sqlConnection = connection;
+					stat.parameters["@catname"] = t_catname.text;
+					stat.text = "INSERT INTO CATEGORY (catname) VALUES (@catname)";
+					stat.addEventListener(SQLErrorEvent.ERROR, onError);
+					stat.execute(-1, new Responder(fatto));
+				}
+			}
+			private function onChange():void {
+				b_new.enabled = true;
+			}
+			private function fatto(evt:SQLResult):void{
+				navigator.pushView(Categories);
+			}
+			private function clearFields():void {
+				t_catname.text = "";
+			}			
+			private function fieldsCheck():Boolean {
+				var validatorErrors:Array = Validator.validateAll(nameValidators);
+				if (validatorErrors.length > 0) {
+					trace("You have to fill name and description field!", "Oops!");
+					return false;
+				}else{
+					return true;
+				}
+			}
+			
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<fx:Array id="nameValidators">
+			<mx:StringValidator source="{t_catname}" property="text" required="true" />
+		</fx:Array>
+	</fx:Declarations>
+	<s:VGroup left="2" top="2">
+		<!--<s:Button id="b_back" label="&lt;&lt;" click="backToChooseUnits(event)" />-->
+		<s:HGroup><s:Label text="Name"/><s:TextInput id="t_catname" change="onChange()" width="250"/></s:HGroup>
+		<s:HGroup>
+			<s:Button id="b_new" label="Create unit" enabled="false" click="onCreate();" />
+			<s:Button id="b_clear" label="Clear" click="clearFields();" />
+		</s:HGroup>
+	</s:VGroup>
+	
+	
+</s:View>

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		xmlns:mx="library://ns.adobe.com/flex/mx"
+		title="Ingredients Edit" creationComplete="init();">
+	<fx:Script>
+		<![CDATA[
+			import flash.data.SQLConnection;
+			import flash.data.SQLMode;
+			import flash.data.SQLResult;
+			import flash.data.SQLStatement;
+			import flash.events.SQLEvent;
+			import flash.filesystem.File;
+			import flash.net.Responder;
+			
+			import mx.collections.ArrayCollection;
+			import mx.utils.ObjectProxy;
+			import mx.validators.Validator;
+			
+			private var connection:SQLConnection;
+			
+			[Bindable]
+			private var listData:ArrayCollection;
+			
+			private function init():void{
+				var dbFile:File = File.applicationDirectory.resolvePath("db/kcal_01.db");
+				var dbWorkFile:File = File.documentsDirectory.resolvePath("kcal_01.db");
+				//var dbFile:File = File.applicationStorageDirectory.resolvePath("kcal_01.db");
+				connection = new SQLConnection();
+				connection.addEventListener(SQLEvent.OPEN, onOpen);
+				connection.openAsync(dbFile, SQLMode.CREATE);
+				
+				if(data){
+					trace("fromView: " + data.fromView);
+					if(data.fromView == "C" || data.fromView == "U"){
+						b_save.enabled = true;
+					}
+				}
+			}
+			protected function onError(event:SQLErrorEvent):void{
+				trace(event.text);
+			}
+			private function onOpen(evt:SQLEvent):void{
+				var stat:SQLStatement = new SQLStatement();
+				stat.sqlConnection = connection;
+				stat.text = "CREATE TABLE IF NOT EXISTS INGREDIENT (id INTEGER PRIMARY KEY AUTOINCREMENT, ingname TEXT, fkcatname TEXT, fkunitname TEXT, unitkcal DECIMAL(5, 2))";
+				connection.addEventListener(SQLErrorEvent.ERROR, onError);
+				stat.execute();
+			}		
+			private function onSave():void {
+				if(fieldsCheck()){
+					var stat:SQLStatement = new SQLStatement();
+					stat.sqlConnection = connection;
+					stat.parameters["@ingname"] = t_ingname.text;
+					stat.parameters["@fkcatname"] = t_fkcatname.text;
+					stat.parameters["@fkunitname"] = t_fkunitname.text;
+					stat.parameters["@unitkcal"] = t_unitkcal.text;
+					stat.text = "UPDATE INGREDIENT SET ingname=@ingname, fkcatname=@fkcatname, fkunitname=@fkunitname, unitkcal=@unitkcal WHERE id=" + data.id_ingredient;
+					stat.addEventListener(SQLErrorEvent.ERROR, onError);
+					stat.execute(-1, new Responder(fatto));
+				}
+			}
+			private function onChange():void {
+				b_save.enabled = true;
+			}
+			private function fatto(evt:SQLResult):void{
+				navigator.pushView(Ingredients, data);
+				/*if(data.fromView == "I" || data.fromView == "C"){
+					trace(data.fromView);
+					data.fromView = "IE"
+					navigator.pushView(Ingredients, data);
+				}else if(data.fromView == "D-DN-I"){
+					data.fromView = "D-DN-I-IE"
+					navigator.pushView(Ingredients, data);
+				}*/
+			}
+			private function clearFields():void {
+				t_ingname.text = t_fkcatname.text = t_fkunitname.text = t_unitkcal.text = "";
+			}			
+			private function fieldsCheck():Boolean {
+				var validatorErrors:Array = Validator.validateAll(nameValidators);
+				if (validatorErrors.length > 0) {
+					trace("You have to fill name and description field!", "Oops!");
+					return false;
+				}else{
+					return true;
+				}
+			}
+			private function selectCategory(event:FocusEvent):void{
+				//var tmpObj:ObjectProxy = new ObjectProxy();
+				//data.id_ingredient = data.id_ingredient;
+				data.ingname = t_ingname.text;
+				data.fkunitname = t_fkunitname.text;
+				data.unitkcal = t_unitkcal.text;
+				data.fromView = "IE";
+				navigator.pushView(Categories, data);
+			}
+			private function selectUnit(event:FocusEvent):void{
+				//var tmpObj:ObjectProxy = new ObjectProxy();
+				//data.id_ingredient = data.id_ingredient;
+				data.ingname = t_ingname.text;
+				data.fkcatname = t_fkcatname.text;
+				data.unitkcal = t_unitkcal.text;
+				data.fromView = "IE";
+				navigator.pushView(Units, data);
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<fx:Array id="nameValidators">
+			<mx:StringValidator source="{t_ingname}" property="text" required="true" />
+			<mx:StringValidator source="{t_fkcatname}" property="text" required="true" />
+			<mx:StringValidator source="{t_fkunitname}" property="text" required="true" />
+			<mx:StringValidator source="{t_unitkcal}" property="text" required="true" />
+		</fx:Array>
+	</fx:Declarations>
+	<s:VGroup left="2" top="2">
+		<!--<s:Label text="From view"/><s:TextInput text="{data.fromView}" editable="false"/>-->
+		<s:HGroup><s:Label text="Category"/><s:TextInput id="t_fkcatname" text="{data.fkcatname}" change="onChange()" focusIn="selectCategory(event)" width="250"/></s:HGroup>
+		<s:HGroup><s:Label text="Name"/><s:TextInput id="t_ingname" text="{data.ingname}" change="onChange()" width="250"/></s:HGroup>
+		<s:HGroup><s:Label text="Unit"/><s:TextInput id="t_fkunitname" text="{data.fkunitname}" change="onChange()" focusIn="selectUnit(event)" width="50"/></s:HGroup>
+		<s:HGroup><s:Label text="Kcal/Unit"/><s:TextInput id="t_unitkcal" text="{data.unitkcal}" change="onChange()" width="100"/></s:HGroup>
+		<s:HGroup>
+			<s:Button id="b_save" label="Save changes" enabled="false" click="onSave();" />
+			<s:Button id="b_clear" label="Clear" click="clearFields();" />
+		</s:HGroup>
+	</s:VGroup>
+</s:View>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		xmlns:mx="library://ns.adobe.com/flex/mx"
+		title="Diary add" creationComplete="init();">
+	<fx:Script>
+		<![CDATA[
+			import flash.data.SQLConnection;
+			import flash.data.SQLMode;
+			import flash.data.SQLResult;
+			import flash.data.SQLStatement;
+			import flash.events.SQLEvent;
+			import flash.filesystem.File;
+			import flash.net.Responder;
+			
+			import mx.collections.ArrayCollection;
+			import mx.validators.Validator;
+			
+			import views.scripts.Functions;
+			
+			private var connection:SQLConnection;
+			
+			[Bindable]
+			private var listData:ArrayCollection;
+			
+			private function init():void{
+				var dbFile:File = File.applicationDirectory.resolvePath("db/kcal_01.db");
+				var dbWorkFile:File = File.documentsDirectory.resolvePath("kcal_01.db");
+				//var dbFile:File = File.applicationStorageDirectory.resolvePath("kcal_01.db");
+				connection = new SQLConnection();
+				connection.addEventListener(SQLEvent.OPEN, onOpen);
+				connection.openAsync(dbFile, SQLMode.CREATE);
+				
+				if(data){
+					trace("fromView: " + data.fromView);
+				}
+			}
+			protected function onError(event:SQLErrorEvent):void{
+				trace(event.text);
+			}
+			private function onOpen(evt:SQLEvent):void{
+				var stat:SQLStatement = new SQLStatement();
+				stat.sqlConnection = connection;
+				stat.text = "CREATE TABLE IF NOT EXISTS DIARY (id INTEGER PRIMARY KEY AUTOINCREMENT, ddate TEXT, dwhat TEXT, iunitkcal DECIMAL(5, 2), dquantity TEXT, dsumm DECIMAL(5, 2), dnote TEXT)";
+				connection.addEventListener(SQLErrorEvent.ERROR, onError);
+				stat.execute();
+			}
+			private function onCreate():void {
+				var stat:SQLStatement = new SQLStatement();
+				stat.sqlConnection = connection;
+				stat.parameters["@date"] = Functions.getDateFormated(t_ddate.selectedDate);
+				stat.parameters["@dwhat"] = t_dwhat.text;
+				stat.parameters["@iunitkcal"] = t_iunitkcal.text;
+				stat.parameters["@dquantity"] = t_dquantity.text;
+				stat.parameters["@dsumm"] = Number(t_dsumm.text);
+				stat.parameters["@dnote"] = t_dnote.text;
+				stat.text = "INSERT INTO DIARY (ddate, dwhat, iunitkcal, dquantity, dsumm, dnote) VALUES (@ddate, @dwhat, @iunitkcal, @dquantity, @dsumm, @dnote)";
+				stat.addEventListener(SQLErrorEvent.ERROR, onError);
+				stat.execute(-1, new Responder(fatto));
+			}
+			private function onChange():void {
+				b_new.enabled = true;
+			}
+			private function fatto(evt:SQLResult):void{
+				navigator.pushView(Categories);
+			}
+			private function clearFields():void {
+				t_dwhat.text = t_iunitkcal.text = t_dquantity.text = t_dsumm.text = t_dnote.text = "";
+			}			
+			private function fieldsCheck():Boolean {
+				var validatorErrors:Array = Validator.validateAll(nameValidators);
+				if (validatorErrors.length > 0) {
+					trace("You have to fill name and description field!", "Oops!");
+					return false;
+				}else{
+					return true;
+				}
+			}
+			
+			protected function chooseIngredient(event:FocusEvent):void{
+				var tmpObj:Object = new Object();
+				tmpObj.id_diary = data.id;
+				tmpObj.dwhat = t_dwhat.text;
+				tmpObj.dquantity = t_dquantity.text;
+				tmpObj.unitname = t_unitname.text;
+				tmpObj.dsumm = t_dsumm.text;
+				tmpObj.iunitkcal = t_iunitkcal.text;
+				tmpObj.dnote = t_dnote.text;
+				tmpObj.fromView = "D-DN";
+				navigator.pushView(Ingredients, tmpObj);
+			}
+			
+			protected function summKcal(event:FocusEvent):void{
+				t_dsumm.text = String(Number(t_dquantity.text) * Number(t_iunitkcal.text));			
+			}
+			
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<fx:Array id="nameValidators">
+			<mx:StringValidator source="{t_ddate}" property="dateItemList" required="true" />
+			<mx:StringValidator source="{t_dwhat}" property="text" required="true" />
+			<mx:StringValidator source="{t_dquantity}" property="text" required="true" />
+			<mx:StringValidator source="{t_dsumm}" property="text" required="true" />
+		</fx:Array>
+	</fx:Declarations>
+	<s:VGroup>		
+		<s:HGroup>
+			<s:Label text="Date"/><s:DateSpinner id="t_ddate" displayMode="date" locale="it_IT" minuteStepSize="10"/></s:HGroup>
+		<s:HGroup><s:TextInput id="selectedDate" text="{t_ddate.selectedDate}" visible="false"/></s:HGroup>
+		<s:HGroup><s:Label text="What"/><s:TextInput id="t_dwhat" text="{data.dwhat}" width="250" focusIn="chooseIngredient(event)" /></s:HGroup>
+		<s:HGroup>
+			<s:HGroup><s:Label text="Quant."/><s:TextInput id="t_dquantity" text="{data.dquantity}" width="100" focusOut="summKcal(event)"/></s:HGroup>
+			<s:HGroup><s:TextInput id="t_unitname" text="{data.unitname}" width="50"/></s:HGroup>
+		</s:HGroup>
+		<s:HGroup>
+			<s:Label text="Summ"/><s:TextInput id="t_dsumm" text="{data.dsumm}" width="100"/>
+			<s:Label text=" * " />
+			<s:TextInput id="t_iunitkcal" text="{data.iunitkcal}" width="75" editable="false"/>
+		</s:HGroup>
+		<s:HGroup><s:Label text="Note"/><s:TextInput id="t_dnote" text="{data.dnote}" width="250"/></s:HGroup>
+		<s:HGroup>
+			<s:Button id="b_new" label="Add" enabled="false" click="onCreate();" />
+			<s:Button id="b_clear" label="Clear" click="clearFields();" />
+		</s:HGroup>
+	</s:VGroup>
+</s:View>

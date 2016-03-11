@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" title="Diary" creationComplete="init();">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import flash.data.SQLConnection;
+			import flash.data.SQLMode;
+			import flash.data.SQLResult;
+			import flash.data.SQLStatement;
+			import flash.events.SQLEvent;
+			import flash.filesystem.File;
+			import flash.net.Responder;
+			
+			import mx.collections.ArrayCollection;
+			import mx.core.FlexGlobals;
+			import mx.utils.ObjectProxy;
+			
+			import views.scripts.Functions;
+			import views.scripts.Model;
+			
+			private var connection:SQLConnection;
+			private var model:Model;
+			
+			[Bindable]
+			private var listData:ArrayCollection;
+			
+			
+			
+			
+			private function init():void{		
+				model = Model.getInstance();
+				selectItems();
+			}
+			
+			
+			
+			
+			
+			private function selectItems():void{
+				model.getDiary().selectItems(new Responder(onSelected), new Responder(onSumm));
+			}
+			
+			private function onSumm(evt:SQLResult):void {
+				t_daysumm.text = evt.data[0].somma;	
+			}
+			private function onSelected(evt:SQLResult):void {
+				listData = new ArrayCollection(evt.data);
+			}
+			private function getFullName(evt:Object):String{
+				return "ID:" + evt.id + " - Date:" + evt.ddate+" - What:" + evt.dwhat +" - Summ kcal:" + evt.dsumm +" - Note:" + evt.dnote;
+			}
+			
+			protected function EditDiaryEntry(event:MouseEvent):void{
+				var tmpObj:Object = new Object();
+				tmpObj.id = dayList.selectedItem.id;
+				tmpObj.diardate = dayList.selectedItem.ddate;
+				tmpObj.diarwhat = dayList.selectedItem.dwhat;
+				tmpObj.unitkcal = dayList.selectedItem.iunitkcal;
+				tmpObj.diarsumm = dayList.selectedItem.dsumm;
+				tmpObj.diarnote = dayList.selectedItem.dnote;
+				navigator.pushView(DiaryEdit, tmpObj);
+			}
+			
+			private function doNew():void {
+				var tmpObj:ObjectProxy = new ObjectProxy();
+				tmpObj.fromView = "D";
+				navigator.pushView(DiaryNew, tmpObj);
+			}
+			private function doEdit():void {
+				/*var tmpObj:ObjectProxy = new ObjectProxy();
+				tmpObj.id_category = dayList.selectedItem.id;
+				tmpObj.catname = dayList.selectedItem.catname;
+				tmpObj.fromView = "C";
+				navigator.pushView(CategoriesEdit, tmpObj);*/
+			}
+			private function doDelete():void {
+				var stat:SQLStatement = new SQLStatement();
+				stat.sqlConnection = connection;
+				stat.text = "DELETE FROM DIARY WHERE id=" + data.id;
+				stat.execute();
+			}
+		]]>
+	</fx:Script>
+	
+	<s:VGroup>	
+		<s:HGroup>
+			<s:Button id="b_new" label="Add" click="doNew();" />
+			<s:Label text="Total kcal"/><s:TextInput id="t_daysumm" width="100"/>
+		</s:HGroup>
+		<s:List id="dayList" width="310" height="360" x="10" fontSize="9" dataProvider="{listData}" labelFunction="getFullName" click="mx.core.FlexGlobals.topLevelApplication.viewMenuOpen=true;"/>
+	</s:VGroup>
+
+	<s:viewMenuItems>
+		<s:ViewMenuItem id="b_edit" label="Edit" click="doEdit();"/>
+		<s:ViewMenuItem id="b_delete" label="Delete" click="doDelete();"/>
+	</s:viewMenuItems>
+</s:View>
