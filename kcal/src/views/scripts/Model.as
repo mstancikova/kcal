@@ -1,6 +1,5 @@
 package views.scripts
 {
-
 	import flash.data.SQLConnection;
 	import flash.data.SQLMode;
 	import flash.events.SQLErrorEvent;
@@ -13,18 +12,26 @@ package views.scripts
 		
 		public var categoryStatus:Object = new Object();
 		public var categoryColumn:Object = new Object();
+		
 		public var ingredientStatus:Object = new Object();
 		public var ingredientColumn:Object = new Object();
+		
 		public var unitStatus:Object = new Object();
 		public var unitColumn:Object = new Object();
+		
 		public var diaryStatus:Object = new Object();
 		public var diaryColumn:Object = new Object();
+		
+		public var foodStatus:Object = new Object();
+		public var foodColumn:Object = new Object();
 		
 		
 		private var diary:Diary;
 		private var units:Units;
 		private var categories:Categories;
 		private var ingredients:Ingredients;
+		private var food:Food;
+		
 				
 		public function Model()
 		{
@@ -54,6 +61,7 @@ package views.scripts
 			units = new Units(connection);
 			categories = new Categories(connection);
 			ingredients = new Ingredients(connection);
+			food = new Food(connection);
 		}
 		protected function onError(event:SQLErrorEvent):void{
 			trace(event.text);
@@ -77,10 +85,10 @@ package views.scripts
 		{
 			return ingredients;
 		}
-		
-		
-		
-		
-		
+		public function getFood() : Food
+		{
+			return food;
+		}
+	
 	}
 }

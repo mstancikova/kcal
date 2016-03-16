@@ -13,7 +13,6 @@
 			  import flash.net.Responder;		
 			  import mx.collections.ArrayCollection;
 			  import mx.core.FlexGlobals;
-			  import mx.utils.ObjectProxy;
 			  import views.scripts.Model;
 			  
 			  private var connection:SQLConnection;

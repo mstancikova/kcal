@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		xmlns:mx="library://ns.adobe.com/flex/mx"
+		title="Food" creationComplete="init();">
+	<fx:Script>
+		<![CDATA[
+			import flash.data.SQLConnection;
+			import flash.data.SQLResult;
+			import flash.net.Responder;
+			import mx.validators.Validator;			
+			import views.scripts.Model;
+			
+			private var connection:SQLConnection;
+			private var model:Model = Model.getInstance();
+			
+			private function init():void{		
+				model = Model.getInstance();
+			}
+			
+			//------------------------------------------------------------------------	
+			private function onSave():void {
+				if(fieldsCheck()){				
+					var obj:Object = new Object();
+					if(model.foodStatus['operation'] == 'New'){
+						obj["@foodname"] = t_foodname.text;
+						model.getFood().Create(obj, new Responder(fatto));
+					}else{
+						obj["@id_food"] = model.foodColumn['id'];
+						obj["@foodname"] = t_foodname.text;
+						model.getFood().Update(obj, new Responder(fatto));
+					}
+				}
+			}
+			private function fatto(evt:SQLResult):void{
+				navigator.pushView(Food);
+				model.foodColumn['id'] = "";
+				model.foodColumn['foodname'] = "";
+			}
+			private function clearFields():void {
+				t_foodname.text = "";
+			}			
+			private function fieldsCheck():Boolean {
+				var validatorErrors:Array = Validator.validateAll(nameValidators);
+				if (validatorErrors.length > 0) {
+					trace("You have to fill name and description field!", "Oops!");
+					return false;
+				}else{
+					return true;
+				}
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<fx:Array id="nameValidators">
+			<mx:StringValidator source="{t_foodname}" property="text" required="true" />
+		</fx:Array>
+	</fx:Declarations>
+	<s:VGroup left="2" top="2">
+		<s:Label styleName="title" text="{model.foodStatus['operation'] + ' F'}"/>
+		<s:HGroup><s:Label text="Greoup name"/><s:TextInput id="t_foodname" text="{model.foodColumn['foodname']}" width="250"/></s:HGroup>
+		<s:HGroup>
+			<s:Button id="b_save" label="Save changes" enabled="false" click="onSave();" />
+			<s:Button id="b_clear" label="Clear" click="clearFields();" />
+		</s:HGroup>
+	</s:VGroup>
+</s:View>
