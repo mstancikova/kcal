@@ -37,29 +37,19 @@
 				  return evt.catname;
 			  }
 			  private function doNew():void {
-				  model.categoriesStatus["operation"] = "New";
+				  model.categoryStatus["operation"] = "New";
+				  model.categoryColumn['fkcatname'] = "";
 				  navigator.pushView(CategoriesEdit);
 			  }
 			  private function doEdit():void {
-				  model.categoriesStatus["operation"] = "Edit";
-				  var tmpObj:ObjectProxy = new ObjectProxy();
-				  tmpObj.id_category = categoriesList.selectedItem.id;
-				  tmpObj.catname = categoriesList.selectedItem.catname;
-				  navigator.pushView(CategoriesEdit, tmpObj);
+				  model.categoryStatus["operation"] = "Edit";
+				  model.categoryColumn['id'] = categoriesList.selectedItem.id;
+				  model.categoryColumn['fkcatname'] = categoriesList.selectedItem.catname;
+				  navigator.pushView(CategoriesEdit);
 			  }
 			  private function doSelect():void {
-			  
 				  model.categoryColumn['fkcatname'] = categoriesList.selectedItem.catname;
 				  navigator.popView();
-				  
-				  /*if(data){
-					  data.fkcatname = categoriesList.selectedItem.catname;
-					  navigator.pushView(IngredientEdit, data);
-				  }else{
-					  var tmpObj:ObjectProxy = new ObjectProxy();
-					  tmpObj.fkcatname = categoriesList.selectedItem.catname;
-					  navigator.pushView(IngredientEdit, data);
-				  }*/
 			  }
 			  private function doDelete():void {
 				  var obj:Object = new Object();
@@ -72,7 +62,6 @@
 		  ]]>
 	  </fx:Script>
 	<s:VGroup left="2" top="2">
-		<s:Button id="b_new" label="Add" click="doNew()" />
 		<s:List width="316" height="360" horizontalCenter="0" verticalCenter="0"
 				id="categoriesList"
 				dataProvider="{listData}"
@@ -86,4 +75,11 @@
 		<s:ViewMenuItem id="b_select" label="Select" click="doSelect();"/>
 		<s:ViewMenuItem id="b_delete" label="Delete" click="doDelete();"/>
 	</s:viewMenuItems>
+	
+	<s:navigationContent>
+		<s:Button label="&lt;&lt;" click="navigator.popView();"/>
+	</s:navigationContent>
+	<s:actionContent>
+		<s:Button label="+" click="doNew();"/>
+	</s:actionContent>    
 </s:View>

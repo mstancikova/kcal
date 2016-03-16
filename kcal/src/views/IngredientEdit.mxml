@@ -2,19 +2,21 @@
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark"
 		xmlns:mx="library://ns.adobe.com/flex/mx"
-		title="Ingredients Edit">
+		title="Ingredients" creationComplete="init();">
 	<fx:Script>
 		<![CDATA[
 			import flash.data.SQLConnection;
 			import flash.data.SQLResult;
-			import flash.net.Responder;
-			
+			import flash.net.Responder;	
 			import mx.validators.Validator;
-			
 			import views.scripts.Model;
 			
 			private var connection:SQLConnection;
 			private var model:Model = Model.getInstance();
+			
+			private function init():void{		
+				model = Model.getInstance();
+			}
 			
 			//-----------------------------------------------------------------
 			private function onSave():void {
@@ -27,7 +29,7 @@
 						obj["@unitkcal"] = t_unitkcal.text;
 						model.getIngredients().Create(obj, new Responder(fatto));
 					}else{
-						obj["@id_ingredient"] = data.id_ingredient;
+						obj["@id_ingredient"] = model.ingredientColumn['id'];
 						obj["@ingname"] = t_ingname.text;
 						obj["@fkcatname"] = t_fkcatname.text;
 						obj["@fkunitname"] = t_fkunitname.text;
@@ -36,11 +38,8 @@
 					}
 				}
 			}
-			private function onChange():void {
-				b_save.enabled = true;
-			}
 			private function fatto(evt:SQLResult):void{
-				navigator.pushView(Ingredients, data);
+				navigator.popView();
 			}
 			private function clearFields():void {
 				t_ingname.text = t_fkcatname.text = t_fkunitname.text = t_unitkcal.text = "";
@@ -55,10 +54,16 @@
 				}
 			}
 			private function selectCategory(event:FocusEvent):void{
-				navigator.pushView(Categories, data);
+				model.ingredientColumn['ingname'] = t_ingname.text;
+				model.unitColumn['fkunitname'] = t_fkunitname.text;
+				model.ingredientColumn['unitkcal'] = t_unitkcal.text;
+				navigator.pushView(Categories);
 			}
 			private function selectUnit(event:FocusEvent):void{
-				navigator.pushView(Units, data);
+				model.categoryColumn['fkcatname'] = t_fkcatname;
+				model.ingredientColumn['ingname'] = t_ingname.text;
+				model.ingredientColumn['unitkcal'] = t_unitkcal.text;
+				navigator.pushView(Units);
 			}
 
 		]]>
@@ -73,12 +78,12 @@
 	</fx:Declarations>
 	<s:VGroup left="2" top="2">
 		<s:Label styleName="title" text="{model.ingredientStatus['operation'] + ' Ingredient'}"/>
-		<s:HGroup><s:Label text="Category"/><s:TextInput id="t_fkcatname" text="{model.categoryColumn['fkcatname']}" change="onChange()" focusIn="selectCategory(event)" width="250"/></s:HGroup>
-		<s:HGroup><s:Label text="Name"/><s:TextInput id="t_ingname" text="{data.ingname}" change="onChange()" width="250"/></s:HGroup>
-		<s:HGroup><s:Label text="Unit"/><s:TextInput id="t_fkunitname" text="{data.fkunitname}" change="onChange()" focusIn="selectUnit(event)" width="50"/></s:HGroup>
-		<s:HGroup><s:Label text="Kcal/Unit"/><s:TextInput id="t_unitkcal" text="{data.unitkcal}" change="onChange()" width="100"/></s:HGroup>
+		<s:HGroup><s:Label text="Category"/><s:TextInput id="t_fkcatname" text="{model.categoryColumn['fkcatname']}" focusIn="selectCategory(event)" width="250"/></s:HGroup>
+		<s:HGroup><s:Label text="Name"/><s:TextInput id="t_ingname" text="{model.ingredientColumn['ingname']}" width="250"/></s:HGroup>
+		<s:HGroup><s:Label text="Unit"/><s:TextInput id="t_fkunitname" text="{model.unitColumn['fkunitname']}" focusIn="selectUnit(event)" width="50"/></s:HGroup>
+		<s:HGroup><s:Label text="Kcal/Unit"/><s:TextInput id="t_unitkcal" text="{model.ingredientColumn['unitkcal']}" width="100"/></s:HGroup>
 		<s:HGroup>
-			<s:Button id="b_save" label="Save changes" enabled="false" click="onSave();" />
+			<s:Button id="b_save" label="Save changes" click="onSave();" />
 			<s:Button id="b_clear" label="Clear" click="clearFields();" />
 		</s:HGroup>
 	</s:VGroup>

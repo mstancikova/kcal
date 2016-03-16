@@ -24,6 +24,16 @@ package views.scripts
 			stat.execute(-1, rowsResponder);
 		}
 		
+		public function selectByCategory(what:Object, rowsResponder:Responder):void{
+			var stat:SQLStatement = new SQLStatement();
+			stat.sqlConnection = connection;
+			for(var i:Object in what){
+				stat.parameters[i] = what[i];
+			}
+			stat.text = "SELECT * FROM INGREDIENT WHERE fkcatname=@catfilter ORDER BY ingname";
+			stat.execute(-1, rowsResponder);
+		}
+		
 		public function Create(what:Object, createResponder:Responder):void {
 			var stat:SQLStatement = new SQLStatement();
 			stat.sqlConnection = connection;

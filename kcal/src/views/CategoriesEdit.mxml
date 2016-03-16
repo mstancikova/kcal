@@ -8,13 +8,11 @@
 			import flash.data.SQLConnection;
 			import flash.data.SQLResult;
 			import flash.net.Responder;
-			
-			import mx.validators.Validator;
-			
+			import mx.validators.Validator;			
 			import views.scripts.Model;
 			
 			private var connection:SQLConnection;
-			private var model:Model;
+			private var model:Model = Model.getInstance();
 			
 			private function init():void{		
 				model = Model.getInstance();
@@ -24,21 +22,20 @@
 			private function onSave():void {
 				if(fieldsCheck()){				
 					var obj:Object = new Object();
-					if(model.categoriesStatus['operation'] == 'New'){
+					if(model.categoryStatus['operation'] == 'New'){
 						obj["@catname"] = t_catname.text;
 						model.getCategories().Create(obj, new Responder(fatto));
 					}else{
-						obj["@id_category"] = data.id_category;
+						obj["@id_category"] = model.categoryColumn['id'];
 						obj["@catname"] = t_catname.text;
 						model.getCategories().Update(obj, new Responder(fatto));
 					}
 				}
 			}
-			private function onChange():void {
-				b_save.enabled = true;
-			}
 			private function fatto(evt:SQLResult):void{
-				navigator.pushView(Categories, data);
+				navigator.pushView(Categories);
+				model.categoryColumn['id'] = "";
+				model.categoryColumn['fkcatname'] = "";
 			}
 			private function clearFields():void {
 				t_catname.text = "";
@@ -60,8 +57,8 @@
 		</fx:Array>
 	</fx:Declarations>
 	<s:VGroup left="2" top="2">
-		<s:Label styleName="title" text="{Model.getInstance().categoriesStatus['operation'] + ' Category'}"/>
-		<s:HGroup><s:Label text="Name"/><s:TextInput id="t_catname" text="{data.catname}" change="onChange()" width="250"/></s:HGroup>
+		<s:Label styleName="title" text="{model.categoryStatus['operation'] + ' Category'}"/>
+		<s:HGroup><s:Label text="Name"/><s:TextInput id="t_catname" text="{model.categoryColumn['fkcatname']}" width="250"/></s:HGroup>
 		<s:HGroup>
 			<s:Button id="b_save" label="Save changes" enabled="false" click="onSave();" />
 			<s:Button id="b_clear" label="Clear" click="clearFields();" />

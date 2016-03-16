@@ -14,7 +14,6 @@
 			
 			import mx.collections.ArrayCollection;
 			import mx.core.FlexGlobals;
-			import mx.utils.ObjectProxy;
 			
 			import views.scripts.Model;
 			
@@ -41,21 +40,20 @@
 			
 			private function doNew():void {
 				model.unitStatus["operation"] = "New";
+				model.unitColumn['fkunitname'] = "";
+				model.unitColumn['unitdesc'] = "";
 				navigator.pushView(UnitsEdit);
 			}
 			private function doEdit():void {
 				model.unitStatus["operation"] = "Edit";
-				var tmpObj:ObjectProxy = new ObjectProxy();
-				tmpObj.id_unit = unitsList.selectedItem.id;
-				tmpObj.unitname = unitsList.selectedItem.unitname;
-				tmpObj.unitdesc = unitsList.selectedItem.unitdesc;
-				navigator.pushView(UnitsEdit, tmpObj);
+				model.unitColumn['id'] = unitsList.selectedItem.id;
+				model.unitColumn['fkunitname'] = unitsList.selectedItem.unitname;
+				model.unitColumn['unitdesc'] = unitsList.selectedItem.unitdesc;
+				navigator.pushView(UnitsEdit);
 			}
 			private function doSelect():void {
-				if(data){
-					data.fkunitname = unitsList.selectedItem.unitname;
-					navigator.pushView(IngredientEdit, data);
-				}
+				model.unitColumn['fkunitname'] = unitsList.selectedItem.unitname;
+				navigator.popView();
 			}
 			private function doDelete():void {
 				var obj:Object = new Object();
@@ -66,7 +64,6 @@
 		]]>
 	</fx:Script>
 	<s:VGroup left="2" top="2">
-		<s:Button id="b_new" label="Add" click="doNew()" />
 		<s:List width="316" height="360" horizontalCenter="0" verticalCenter="0"
 				id="unitsList"
 				dataProvider="{listData}"
@@ -80,4 +77,11 @@
 		<s:ViewMenuItem id="b_select" label="Select" click="doSelect();"/>
 		<s:ViewMenuItem id="b_delete" label="Delete" click="doDelete();"/>
 	</s:viewMenuItems>
+	
+	<s:navigationContent>
+	<s:Button label="&lt;&lt;" click="navigator.popView();"/>
+	</s:navigationContent>
+	<s:actionContent>
+		<s:Button label="+" click="doNew();"/>
+	</s:actionContent>    
 </s:View>

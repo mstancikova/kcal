@@ -25,7 +25,7 @@
 						obj["@unitdesc"] = t_unitdesc.text;
 						model.getUnits().Create(obj, new Responder(fatto));
 					}else{
-						obj["@id_unit"] = data.id_unit;
+						obj["@id_unit"] = model.unitColumn['id'];
 						obj["@unitname"] = t_unitname.text;
 						obj["@unitdesc"] = t_unitdesc.text;
 						model.getUnits().Update(obj, new Responder(fatto));
@@ -36,7 +36,10 @@
 				b_save.enabled = true;
 			}
 			private function fatto(evt:SQLResult):void{
-				navigator.pushView(Units, data);				
+				navigator.popView();
+				model.unitColumn['id'] = "";
+				model.unitColumn['fkunitname'] = "";
+				model.unitColumn['unitdesc'] = "";
 			}
 			private function clearFields():void {
 				t_unitname.text = t_unitdesc.text = "";
@@ -60,8 +63,8 @@
 	</fx:Declarations>
 	<s:VGroup left="2" top="2">
 		<s:Label styleName="title" text="{model.unitStatus['operation'] + ' Unit'}"/>
-		<s:HGroup><s:Label text="Name"/><s:TextInput id="t_unitname" text="{data.unitname}" change="onChange()" width="250"/></s:HGroup>
-		<s:HGroup><s:Label text="Description"/><s:TextInput id="t_unitdesc" text="{data.unitdesc}" change="onChange()" width="250"/></s:HGroup>
+		<s:HGroup><s:Label text="Name"/><s:TextInput id="t_unitname" text="{model.unitColumn['fkunitname']}" change="onChange()" width="250"/></s:HGroup>
+		<s:HGroup><s:Label text="Description"/><s:TextInput id="t_unitdesc" text="{model.unitColumn['unitdesc']}" change="onChange()" width="250"/></s:HGroup>
 		<s:HGroup>
 			<s:Button x="2" id="b_save" label="Save changes" enabled="false" click="onSave();" />
 			<s:Button id="b_clear" label="Clear" click="clearFields();" />

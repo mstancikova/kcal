@@ -1,9 +1,29 @@
 /* CSS file */
 @namespace s "library://ns.adobe.com/flex/spark";
 
-s|Button {fontSize: 12pt; font-weight:normal;}
-s|Label {fontSize: 12pt; padding-top:15px;}
-.title{color:#003366; fontWeight:bold; textAlign:center;}
+s|Button {
+	fontSize: 12pt; 
+	font-weight:normal;
+	padding:0px;
+}
+s|Label {
+	fontSize: 12pt; 
+	padding-top:15px;
+}
+.title{
+	color:#003366; 
+	fontWeight:bold; 
+	textAlign:center;
+}
+s|ActionBar{
+	chromeColor: #003366;
+	titleAlign: center;
+	defaultButtonAppearance: beveled;
+}
+
+s|ActionBar #titleDisplay{
+	fontSize: 10;
+}
 
 /* Change padding for all DateSpinner controls */
 s|SpinnerListItemRenderer {

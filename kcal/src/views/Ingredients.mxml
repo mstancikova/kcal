@@ -10,11 +10,11 @@
 		<![CDATA[
 			import flash.data.SQLConnection;
 			import flash.data.SQLResult;
-			import flash.data.SQLStatement;
-			import flash.net.Responder;		
+			import flash.net.Responder;
+			
 			import mx.collections.ArrayCollection;
 			import mx.core.FlexGlobals;
-			import mx.utils.ObjectProxy;
+			
 			import views.scripts.Model;
 			
 			private var connection:SQLConnection;
@@ -22,58 +22,77 @@
 			
 			[Bindable]
 			private var listData:ArrayCollection;
+			[Bindable]
+			private var listCats:ArrayCollection;
 			
 			private function init():void{		
 				selectItems();
+				selectCategories();
 			}
 			private function selectItems():void{
 				model.getIngredients().selectItems(new Responder(onSelected));
 			}
+			//per la lista categories per dropdown list
+			private function selectCategories():void{
+				model.getCategories().selectItems(new Responder(onSelectedCat));
+			}
 			
 			//------------------------------------------------------------------------
+			//lista ingredients
 			private function onSelected(evt:SQLResult):void {
 				listData = new ArrayCollection(evt.data);
 			}
 			private function getFullName(evt:Object):String{
 				return evt.ingname;
 			}
-			
+			//per la lista categories per dropdown list
+			private function onSelectedCat(evt:SQLResult):void {
+				listCats = new ArrayCollection(evt.data);
+			}
+			private function getCatName(evt:Object):String{
+				return evt.catname;
+			}
 			private function doNew():void {
 				model.ingredientStatus["operation"] = "New";
 				navigator.pushView(IngredientEdit);
 			}
 			private function doEdit():void {
 				model.ingredientStatus["operation"] = "Edit";
-				var tmpObj:ObjectProxy = new ObjectProxy();
-				tmpObj.id_ingredient = ingredientsList.selectedItem.id;
-				tmpObj.ingname = ingredientsList.selectedItem.ingname;
-				tmpObj.fkcatname = ingredientsList.selectedItem.fkcatname;
-				tmpObj.fkunitname = ingredientsList.selectedItem.fkunitname;
-				tmpObj.unitkcal = ingredientsList.selectedItem.unitkcal;
-				navigator.pushView(IngredientEdit, tmpObj);
+				model.ingredientColumn['id'] = ingredientsList.selectedItem.id;
+				model.ingredientColumn['ingname'] = ingredientsList.selectedItem.ingname;
+				model.categoryColumn['fkcatname'] = ingredientsList.selectedItem.fkcatname;
+				model.unitColumn['fkunitname'] = ingredientsList.selectedItem.fkunitname;
+				model.ingredientColumn['unitkcal'] = ingredientsList.selectedItem.unitkcal;
+				navigator.pushView(IngredientEdit);
 			}
 			private function doSelect():void {
-				if(data){
-					data.dwhat = ingredientsList.selectedItem.ingname;
-					data.iunitkcal = ingredientsList.selectedItem.unitkcal;
-					data.unitname = ingredientsList.selectedItem.fkunitname;
-					navigator.pushView(DiaryNew, data);
-				}
+				model.diaryColumn['dwhat'] = ingredientsList.selectedItem.ingname;
+				model.unitColumn['fkunitname'] = ingredientsList.selectedItem.fkunitname;
+				model.ingredientColumn['unitkcal'] = ingredientsList.selectedItem.unitkcal;
+				navigator.popView();
 			}
-			
 			private function doDelete():void {
 				var obj:Object = new Object();
 				obj["@id_ingredient"] = ingredientsList.selectedItem.id;
-				model.getCategories().Delete(obj);
-				navigator.pushView(Categories);
+				model.getIngredients().Delete(obj);
+				navigator.pushView(Ingredients);
+			}
+			protected function dropdownList_chengeHandler(event:Event):void
+			{
+				//trace(categorySpinner.selectedItem.catname);
+				var obj:Object = new Object();
+				obj["@catfilter"] = categorySpinner.selectedItem.catname;
+				model.getIngredients().selectByCategory(obj, new Responder(onSelected));
 			}
 			
 		]]>
 	</fx:Script>
-
 	<s:VGroup left="2" top="2">
-		<s:Button id="b_new" label="Add" click="doNew()" />
-		<s:List width="316" height="360" horizontalCenter="0" verticalCenter="0"
+		<s:SpinnerListContainer horizontalCenter="0" width="100%" top="5" bottom="5">
+			<s:SpinnerList id="categorySpinner" textAlign="center" width="100%" dataProvider="{listCats}" labelField="catname"
+						   change="dropdownList_chengeHandler(event)"></s:SpinnerList> 
+		</s:SpinnerListContainer>
+		<s:List width="316" height="280" horizontalCenter="0" verticalCenter="0"
 				id="ingredientsList"
 				dataProvider="{listData}"
 				labelFunction="getFullName"
@@ -86,4 +105,11 @@
 		<s:ViewMenuItem id="b_select" label="Select" click="doSelect();"/>
 		<s:ViewMenuItem id="b_delete" label="Delete" click="doDelete();"/>
 	</s:viewMenuItems>
+	
+	<s:navigationContent>
+	<s:Button label="&lt;&lt;" click="navigator.popView();"/>
+	</s:navigationContent>
+	<s:actionContent>
+		<s:Button label="+" click="doNew();"/>
+	</s:actionContent>    
 </s:View>

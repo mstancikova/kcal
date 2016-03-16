@@ -11,10 +11,15 @@ package views.scripts
 		private static var _instance:Model;
 		private var connection:SQLConnection;
 		
-		public var unitStatus:Object = new Object();
-		public var categoriesStatus:Object = new Object();
+		public var categoryStatus:Object = new Object();
 		public var categoryColumn:Object = new Object();
 		public var ingredientStatus:Object = new Object();
+		public var ingredientColumn:Object = new Object();
+		public var unitStatus:Object = new Object();
+		public var unitColumn:Object = new Object();
+		public var diaryStatus:Object = new Object();
+		public var diaryColumn:Object = new Object();
+		
 		
 		private var diary:Diary;
 		private var units:Units;

@@ -23,7 +23,7 @@ package views.scripts
 			stat.text = "SELECT * FROM CATEGORY ORDER BY id";
 			stat.execute(-1, rowsResponder);
 		}
-		
+				
 		public function Create(what:Object, createResponder:Responder):void {
 			var stat:SQLStatement = new SQLStatement();
 			stat.sqlConnection = connection;
