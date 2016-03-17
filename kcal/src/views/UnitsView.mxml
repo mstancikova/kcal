@@ -55,6 +55,7 @@
 				navigator.pushView(UnitsEdit);
 			}
 			private function doSelect():void {
+				units.status.operation = "Selected";
 				ingredients.fkunitname = unitsList.selectedItem.unitname;
 				navigator.popView();
 			}

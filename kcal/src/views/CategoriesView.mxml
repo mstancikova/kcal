@@ -54,6 +54,7 @@
 				  navigator.pushView(CategoriesEdit);
 			  }
 			  private function doSelect():void {
+				  category.status.operation = "Selected";
 				  ingredients.fkcatname = categoriesList.selectedItem.catname;
 				  navigator.popView();
 			  }

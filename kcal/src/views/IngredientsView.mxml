@@ -76,6 +76,7 @@
 				navigator.pushView(IngredientEdit);
 			}
 			private function doSelect():void {
+				ingredients.status.operation = "Selected";
 				diary.dwhat = ingredientsList.selectedItem.ingname;
 				ingredients.fkunitname = ingredientsList.selectedItem.fkunitname;
 				ingredients.unitkcal = ingredientsList.selectedItem.unitkcal;
