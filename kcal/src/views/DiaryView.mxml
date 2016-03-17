@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" title="Diary" creationComplete="init();">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import flash.data.SQLConnection;
+			import flash.data.SQLResult;
+			import flash.net.Responder;
+			
+			import mx.collections.ArrayCollection;
+			import mx.core.FlexGlobals;
+			
+			import views.scripts.Diary;
+			import views.scripts.Model;
+			
+			private var connection:SQLConnection;
+			private var diary:views.scripts.Diary = Model.getInstance().getDiary();
+			
+			[Bindable]
+			private var listData:ArrayCollection;
+		
+			private function init():void{		
+				selectItems();
+			}
+			
+			private function selectItems():void{
+				diary.selectItems(new Responder(onSelected), new Responder(onSumm));
+			}
+			
+			//-------------------------------------------------------------------------------------------
+			private function onSumm(evt:SQLResult):void {
+				t_daysumm.text = evt.data[0].somma;	
+			}
+			private function onSelected(evt:SQLResult):void {
+				listData = new ArrayCollection(evt.data);
+			}
+			private function getFullName(evt:Object):String{
+				return evt.dwhat +" (" + evt.dsumm +")";
+			}
+			
+			private function doNew():void {
+				diary.status.operation = "New";
+				navigator.pushView(DiaryEdit);
+			}
+			private function doEdit():void {
+				diary.status.operation = "Edit";
+				diary.id = dayList.selectedItem.id;
+				diary.dwhat = dayList.selectedItem.dwhat;
+				diary.iunitkcal = Number(dayList.selectedItem.iunitkcal);
+				diary.dquantity = dayList.selectedItem.dquantity;
+				diary.dsumm = dayList.selectedItem.dsumm;
+				diary.dnote = dayList.selectedItem.dnote;
+				navigator.pushView(DiaryEdit);
+			}
+			private function doDelete():void {
+				var obj:Object = new Object();
+				obj["@id_diary"] = dayList.selectedItem.id;
+				diary.Delete(obj);
+				navigator.pushView(DiaryView);
+			}
+		]]>
+	</fx:Script>
+	
+	<s:VGroup top="5">	
+		<s:HGroup>
+			<s:Label text="Total kcal"/><s:TextInput id="t_daysumm" width="100"/>
+		</s:HGroup>
+		<s:List id="dayList" width="310" height="360" x="10" fontSize="9" dataProvider="{listData}" labelFunction="getFullName" click="mx.core.FlexGlobals.topLevelApplication.viewMenuOpen=true;"/>
+	</s:VGroup>
+
+	<s:viewMenuItems>
+		<s:ViewMenuItem id="b_edit" label="Edit" click="doEdit();"/>
+		<s:ViewMenuItem id="b_delete" label="Delete" click="doDelete();"/>
+	</s:viewMenuItems>
+
+	<s:actionContent>
+		<s:Button label="+" click="doNew();"/>
+	</s:actionContent>    
+		
+</s:View>
