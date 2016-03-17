@@ -2,40 +2,45 @@
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark"
 		xmlns:mx="library://ns.adobe.com/flex/mx"
-		title="Categories" creationComplete="init();">
+		title="Categories">
 	<fx:Script>
 		<![CDATA[
 			import flash.data.SQLConnection;
 			import flash.data.SQLResult;
 			import flash.net.Responder;
-			import mx.validators.Validator;			
+			
+			import mx.validators.Validator;
+			
+			import spark.events.TextOperationEvent;
+			
+			import views.scripts.Categories;
 			import views.scripts.Model;
 			
 			private var connection:SQLConnection;
-			private var model:Model = Model.getInstance();
 			
-			private function init():void{		
-				model = Model.getInstance();
-			}
+			[Bindable]
+			private var category:views.scripts.Categories = Model.getInstance().getCategories();
+			
+			
 			
 			//------------------------------------------------------------------------	
 			private function onSave():void {
 				if(fieldsCheck()){				
 					var obj:Object = new Object();
-					if(model.categoryStatus['operation'] == 'New'){
+					if(category.status.operation == 'New'){
 						obj["@catname"] = t_catname.text;
-						model.getCategories().Create(obj, new Responder(fatto));
+						category.Create(obj, new Responder(fatto));
 					}else{
-						obj["@id_category"] = model.categoryColumn['id'];
+						obj["@id_category"] = category.id;
 						obj["@catname"] = t_catname.text;
-						model.getCategories().Update(obj, new Responder(fatto));
+						category.Update(obj, new Responder(fatto));
 					}
 				}
 			}
 			private function fatto(evt:SQLResult):void{
-				navigator.pushView(Categories);
-				model.categoryColumn['id'] = "";
-				model.categoryColumn['fkcatname'] = "";
+				navigator.pushView(CategoriesView);
+				category.id = -1;
+				category.catname = "";
 			}
 			private function clearFields():void {
 				t_catname.text = "";
@@ -49,6 +54,12 @@
 					return true;
 				}
 			}
+			
+			protected function onChangeHandler(event:TextOperationEvent):void
+			{
+				b_save.enabled=true;				
+			}
+			
 		]]>
 	</fx:Script>
 	<fx:Declarations>
@@ -56,9 +67,9 @@
 			<mx:StringValidator source="{t_catname}" property="text" required="true" />
 		</fx:Array>
 	</fx:Declarations>
-	<s:VGroup left="2" top="2">
-		<s:Label styleName="title" text="{model.categoryStatus['operation'] + ' Category'}"/>
-		<s:HGroup><s:Label text="Name"/><s:TextInput id="t_catname" text="{model.categoryColumn['fkcatname']}" width="250"/></s:HGroup>
+	<s:VGroup left="2" top="2"> 
+		<s:Label styleName="title" text="{category.status.operation + ' Category'}"/>
+		<s:HGroup><s:Label text="Name"/><s:TextInput id="t_catname" text="{category.catname}" width="250" change="onChangeHandler(event)"/></s:HGroup>
 		<s:HGroup>
 			<s:Button id="b_save" label="Save changes" enabled="false" click="onSave();" />
 			<s:Button id="b_clear" label="Clear" click="clearFields();" />

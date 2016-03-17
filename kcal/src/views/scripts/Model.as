@@ -10,20 +10,20 @@ package views.scripts
 		private static var _instance:Model;
 		private var connection:SQLConnection;
 		
-		public var categoryStatus:Object = new Object();
-		public var categoryColumn:Object = new Object();
-		
-		public var ingredientStatus:Object = new Object();
-		public var ingredientColumn:Object = new Object();
-		
-		public var unitStatus:Object = new Object();
-		public var unitColumn:Object = new Object();
-		
+		[Bindable]
 		public var diaryStatus:Object = new Object();
+		[Bindable]
 		public var diaryColumn:Object = new Object();
 		
+		[Bindable]
 		public var foodStatus:Object = new Object();
+		[Bindable]
 		public var foodColumn:Object = new Object();
+		
+		[Bindable]
+		public var foodingredientsStatus:Object = new Object();
+		[Bindable]
+		public var foodingredientsColumn:Object = new Object();
 		
 		
 		private var diary:Diary;
@@ -31,6 +31,7 @@ package views.scripts
 		private var categories:Categories;
 		private var ingredients:Ingredients;
 		private var food:Food;
+		private var foodingredients:Foodingredients;
 		
 				
 		public function Model()
@@ -62,6 +63,7 @@ package views.scripts
 			categories = new Categories(connection);
 			ingredients = new Ingredients(connection);
 			food = new Food(connection);
+			foodingredients = new Foodingredients(connection);
 		}
 		protected function onError(event:SQLErrorEvent):void{
 			trace(event.text);
@@ -88,6 +90,10 @@ package views.scripts
 		public function getFood() : Food
 		{
 			return food;
+		}
+		public function getFoodingredients() : Foodingredients
+		{
+			return foodingredients;
 		}
 	
 	}

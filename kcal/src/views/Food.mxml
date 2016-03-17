@@ -48,6 +48,10 @@
 				model.foodColumn['foodname'] = foodList.selectedItem.foodname;
 				navigator.pushView(FoodEdit);
 			}
+			private function doAdd():void {
+				model.foodingredientsColumn["fname"] = foodList.selectedItem.foodname;;
+				navigator.pushView(FoodIngredients);
+			}
 			private function doSelect():void {
 				model.foodColumn['foodname'] = foodList.selectedItem.foodname;
 				navigator.popView();
@@ -71,6 +75,7 @@
 	
 	<s:viewMenuItems>
 		<s:ViewMenuItem id="b_edit" label="Edit" click="doEdit();"/>
+		<s:ViewMenuItem id="b_add" label="Add Ingredients" click="doAdd();"/>
 		<s:ViewMenuItem id="b_select" label="Select" click="doSelect();"/>
 		<s:ViewMenuItem id="b_delete" label="Delete" click="doDelete();"/>
 	</s:viewMenuItems>

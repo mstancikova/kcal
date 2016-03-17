@@ -14,11 +14,14 @@
 			
 			import mx.collections.ArrayCollection;
 			import mx.core.FlexGlobals;
-			
+
 			import views.scripts.Model;
 			
 			private var connection:SQLConnection;
-			private var model:Model = Model.getInstance();
+			[Bindable]
+			private var units:views.scripts.Units = Model.getInstance().getUnits();
+			[Bindable]
+			private var ingredients:views.scripts.Ingredients = Model.getInstance().getIngredients();
 			
 			[Bindable]
 			private var listData:ArrayCollection;
@@ -27,7 +30,7 @@
 				selectItems();
 			}
 			private function selectItems():void{
-				model.getUnits().selectItems(new Responder(onSelected));
+				units.selectItems(new Responder(onSelected));
 			}
 			
 			//-------------------------------------------------------------------------
@@ -39,27 +42,27 @@
 			}
 			
 			private function doNew():void {
-				model.unitStatus["operation"] = "New";
-				model.unitColumn['fkunitname'] = "";
-				model.unitColumn['unitdesc'] = "";
+				units.status.operation = "New";
+				units.unitname = "";
+				units.unitdesc = "";
 				navigator.pushView(UnitsEdit);
 			}
 			private function doEdit():void {
-				model.unitStatus["operation"] = "Edit";
-				model.unitColumn['id'] = unitsList.selectedItem.id;
-				model.unitColumn['fkunitname'] = unitsList.selectedItem.unitname;
-				model.unitColumn['unitdesc'] = unitsList.selectedItem.unitdesc;
+				units.status.operation = "Edit";
+				units.id = unitsList.selectedItem.id;
+				units.unitname = unitsList.selectedItem.unitname;
+				units.unitdesc = unitsList.selectedItem.unitdesc;
 				navigator.pushView(UnitsEdit);
 			}
 			private function doSelect():void {
-				model.unitColumn['fkunitname'] = unitsList.selectedItem.unitname;
+				ingredients.fkunitname = unitsList.selectedItem.unitname;
 				navigator.popView();
 			}
 			private function doDelete():void {
 				var obj:Object = new Object();
 				obj["@id_unit"] = unitsList.selectedItem.id;
-				model.getUnits().Delete(obj);
-				navigator.pushView(Units);
+				units.Delete(obj);
+				navigator.pushView(UnitsView);
 			}
 		]]>
 	</fx:Script>

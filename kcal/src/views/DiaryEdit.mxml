@@ -2,53 +2,54 @@
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark"
 		xmlns:mx="library://ns.adobe.com/flex/mx"
-		title="Diary" creationComplete="init();">
+		title="Diary">
 	<fx:Script>
 		<![CDATA[
 			import flash.data.SQLConnection;
 			import flash.data.SQLResult;
-			import flash.net.Responder;			
+			import flash.net.Responder;
+			
 			import mx.validators.Validator;
+			
+			import views.scripts.Diary;
 			import views.scripts.Functions;
 			import views.scripts.Model;
 			
 			private var connection:SQLConnection;
-			private var model:Model = Model.getInstance();
-			
-			private function init():void{		
-				model = Model.getInstance();
-			}
+			[Bindable]
+			private var diary:views.scripts.Diary = Model.getInstance().getDiary();
+			[Bindable]
+			private var ingredients:views.scripts.Ingredients = Model.getInstance().getIngredients();
 			
 			//------------------------------------------------------------------------
 			private function onSave():void {
 				if(fieldsCheck()){				
 					var obj:Object = new Object();
-					if(model.diaryStatus['operation'] == 'New'){
+					if(diary.status.operation == 'New'){
 						obj["@ddate"] = Functions.getDateFormated(t_ddate.selectedDate);
 						obj["@dwhat"] = t_dwhat.text;
 						obj["@dquantity"] = t_dquantity.text;
 						obj["@dsumm"] = Number(t_dsumm.text);
 						obj["@iunitkcal"] = Number(t_iunitkcal.text);
 						obj["@dnote"] = t_dnote.text;
-						model.getDiary().Create(obj, new Responder(fatto));
-						//trace("data:"+obj["@ddate"]+" dwhat:"+obj["@dwhat"]+" dquantity:"+obj["@dquantity"]+" dsumm:"+obj["@dsumm"]+" iunitkcal:"+obj["@iunitkcal"]+" dnote:"+obj["@dnote"]);
+						diary.Create(obj, new Responder(fatto));
 					}else{
-						obj["@id_diary"] = model.unitColumn['id'];
+						obj["@id_diary"] = diary.id;
 						obj["@ddate"] = Functions.getDateFormated(t_ddate.selectedDate);
 						obj["@dwhat"] = t_dwhat.text;
 						obj["@dquantity"] = t_dquantity.text;
 						obj["@dsumm"] = Number(t_dsumm.text);
 						obj["@iunitkcal"] = Number(t_iunitkcal.text);
 						obj["@dnote"] = t_dnote.text;
-						model.getDiary().Update(obj, new Responder(fatto));
+						diary.Update(obj, new Responder(fatto));
 					}
 				}
 			}
 			private function selectIngredient(event:FocusEvent):void{
-				navigator.pushView(Ingredients);
+				navigator.pushView(IngredientsView);
 			}
 			private function fatto(evt:SQLResult):void{
-				navigator.pushView(Diary);
+				navigator.pushView(DiaryView);
 			}
 			private function clearFields():void {
 				t_dwhat.text = t_iunitkcal.text = t_dquantity.text = t_dsumm.text = t_dnote.text = "";
@@ -63,7 +64,11 @@
 				}
 			}
 			protected function summKcal(event:FocusEvent):void{
-				t_dsumm.text = String(Number(t_dquantity.text) * Number(t_iunitkcal.text));			
+				if(diary.status.operation == "Edit"){
+					t_dsumm.text = String(Number(t_dquantity.text) * Number(diary.iunitkcal));	
+				}else if(diary.status.operation == "New"){
+					t_dsumm.text = String(Number(t_dquantity.text) * Number(ingredients.unitkcal));
+				}
 			}
 			
 		]]>
@@ -77,19 +82,19 @@
 		</fx:Array>
 	</fx:Declarations>
 	<s:VGroup>	
-		<s:Label styleName="title" text="{model.diaryStatus['operation'] + ' Diary Entry'}"/>
+		<s:Label styleName="title" text="{diary.status.operation + ' Diary Entry'}"/>
 		<s:HGroup><s:Label text="Date"/><s:DateSpinner id="t_ddate" displayMode="date" locale="it_IT" minuteStepSize="10"/><s:TextInput id="selectedDate" text="{t_ddate.selectedDate}" visible="false" width="0"/></s:HGroup>
-		<s:HGroup><s:Label text="What"/><s:TextInput id="t_dwhat" text="{model.diaryColumn['dwhat']}" width="250" focusIn="selectIngredient(event)" /></s:HGroup>
+		<s:HGroup><s:Label text="What"/><s:TextInput id="t_dwhat" text="{diary.dwhat}" width="250" focusIn="selectIngredient(event)" /></s:HGroup>
 		<s:HGroup>
-			<s:HGroup><s:Label text="Quant."/><s:TextInput id="t_dquantity" text="{model.diaryColumn['dquantity']}" width="100" focusOut="summKcal(event)"/></s:HGroup>
-			<s:Label text="{model.unitColumn['fkunitname']}"/>
+			<s:HGroup><s:Label text="Quant."/><s:TextInput id="t_dquantity" text="@{diary.dquantity}" width="100" focusOut="summKcal(event)"/></s:HGroup>
+			<s:Label text="{ingredients.fkunitname}"/>
 		</s:HGroup>
 		<s:HGroup>
-			<s:Label text="Summ"/><s:TextInput id="t_dsumm" text="{model.diaryColumn['dsumm']}" width="100"/>
+			<s:Label text="Summ"/><s:TextInput id="t_dsumm" text="{diary.dsumm}" width="100"/>
 			<s:Label text=" * " />
-			<s:TextInput id="t_iunitkcal" text="{model.ingredientColumn['unitkcal']}" width="75" editable="false"/>
+			<s:TextInput id="t_iunitkcal" text="{(diary.status.operation == 'Edit') ? diary.iunitkcal : ingredients.unitkcal}" width="75" editable="false"/>
 		</s:HGroup>
-		<s:HGroup><s:Label text="Note"/><s:TextInput id="t_dnote" text="{model.diaryColumn['dnote']}" width="250"/></s:HGroup>
+		<s:HGroup><s:Label text="Note"/><s:TextInput id="t_dnote" text="@{diary.dnote}" width="250"/></s:HGroup>
 		<s:HGroup>
 			<s:Button x="2" id="b_save" label="Save changes" click="onSave();" />
 			<s:Button id="b_clear" label="Clear" click="clearFields();" />

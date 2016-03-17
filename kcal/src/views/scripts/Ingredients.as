@@ -6,6 +6,17 @@ package views.scripts
 
 	public class Ingredients extends Table
 	{
+		//current record data
+		[Bindable]
+		public var id:int;
+		[Bindable]
+		public var ingname:String;
+		[Bindable]
+		public var fkcatname:String;
+		[Bindable]
+		public var fkunitname:String;
+		[Bindable]
+		public var unitkcal:String;
 		
 		public function Ingredients(conn:SQLConnection)
 		{

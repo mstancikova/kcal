@@ -10,13 +10,20 @@
 		  <![CDATA[
 			  import flash.data.SQLConnection;
 			  import flash.data.SQLResult;
-			  import flash.net.Responder;		
+			  import flash.net.Responder;
+			  
 			  import mx.collections.ArrayCollection;
 			  import mx.core.FlexGlobals;
+			  
+			  import views.scripts.Categories;
 			  import views.scripts.Model;
 			  
 			  private var connection:SQLConnection;
-			  private var model:Model = Model.getInstance();
+			 
+			  [Bindable]
+			  private var category:views.scripts.Categories = Model.getInstance().getCategories();
+			  [Bindable]
+			  private var ingredients:views.scripts.Ingredients = Model.getInstance().getIngredients();
 			  
 			  [Bindable]
 			  private var listData:ArrayCollection;
@@ -25,7 +32,7 @@
 				  selectItems();
 			  }
 			  private function selectItems():void{
-				  model.getCategories().selectItems(new Responder(onSelected));
+				  category.selectItems(new Responder(onSelected));
 			  }
 			  
 			  //-------------------------------------------------------------------------
@@ -36,25 +43,25 @@
 				  return evt.catname;
 			  }
 			  private function doNew():void {
-				  model.categoryStatus["operation"] = "New";
-				  model.categoryColumn['fkcatname'] = "";
+				  category.status["operation"] = "New";
+				  category.catname = "";
 				  navigator.pushView(CategoriesEdit);
 			  }
 			  private function doEdit():void {
-				  model.categoryStatus["operation"] = "Edit";
-				  model.categoryColumn['id'] = categoriesList.selectedItem.id;
-				  model.categoryColumn['fkcatname'] = categoriesList.selectedItem.catname;
+				  category.status["operation"] = "Edit";
+				  category.id = categoriesList.selectedItem.id;
+				  category.catname = categoriesList.selectedItem.catname;
 				  navigator.pushView(CategoriesEdit);
 			  }
 			  private function doSelect():void {
-				  model.categoryColumn['fkcatname'] = categoriesList.selectedItem.catname;
+				  ingredients.fkcatname = categoriesList.selectedItem.catname;
 				  navigator.popView();
 			  }
 			  private function doDelete():void {
 				  var obj:Object = new Object();
 				  obj["@id_category"] = categoriesList.selectedItem.id;
-				  model.getCategories().Delete(obj);
-				  navigator.pushView(Categories);
+				  category.Delete(obj);
+				  navigator.pushView(CategoriesView);
 			  }
 			  
 			  

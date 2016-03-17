@@ -15,10 +15,16 @@
 			import mx.collections.ArrayCollection;
 			import mx.core.FlexGlobals;
 			
+			import views.scripts.Ingredients;
 			import views.scripts.Model;
 			
 			private var connection:SQLConnection;
-			private var model:Model = Model.getInstance();
+			[Bindable]
+			private var ingredients:views.scripts.Ingredients = Model.getInstance().getIngredients();
+			[Bindable]
+			private var category:views.scripts.Categories = Model.getInstance().getCategories();
+			[Bindable]
+			private var diary:views.scripts.Diary = Model.getInstance().getDiary();
 			
 			[Bindable]
 			private var listData:ArrayCollection;
@@ -30,11 +36,11 @@
 				selectCategories();
 			}
 			private function selectItems():void{
-				model.getIngredients().selectItems(new Responder(onSelected));
+				ingredients.selectItems(new Responder(onSelected));
 			}
 			//per la lista categories per dropdown list
 			private function selectCategories():void{
-				model.getCategories().selectItems(new Responder(onSelectedCat));
+				category.selectItems(new Responder(onSelectedCat));
 			}
 			
 			//------------------------------------------------------------------------
@@ -48,41 +54,48 @@
 			//per la lista categories per dropdown list
 			private function onSelectedCat(evt:SQLResult):void {
 				listCats = new ArrayCollection(evt.data);
+				var emptyC:Object = new Object();
+				emptyC.id = 0;
+				emptyC.catname = "All";
+				listCats.addItemAt(emptyC,0);
 			}
 			private function getCatName(evt:Object):String{
 				return evt.catname;
 			}
 			private function doNew():void {
-				model.ingredientStatus["operation"] = "New";
+				ingredients.status.operation = "New";
 				navigator.pushView(IngredientEdit);
 			}
 			private function doEdit():void {
-				model.ingredientStatus["operation"] = "Edit";
-				model.ingredientColumn['id'] = ingredientsList.selectedItem.id;
-				model.ingredientColumn['ingname'] = ingredientsList.selectedItem.ingname;
-				model.categoryColumn['fkcatname'] = ingredientsList.selectedItem.fkcatname;
-				model.unitColumn['fkunitname'] = ingredientsList.selectedItem.fkunitname;
-				model.ingredientColumn['unitkcal'] = ingredientsList.selectedItem.unitkcal;
+				ingredients.status.operation = "Edit";
+				ingredients.id = ingredientsList.selectedItem.id;
+				ingredients.ingname = ingredientsList.selectedItem.ingname;
+				ingredients.fkcatname = ingredientsList.selectedItem.fkcatname;
+				ingredients.fkunitname = ingredientsList.selectedItem.fkunitname;
+				ingredients.unitkcal = ingredientsList.selectedItem.unitkcal;
 				navigator.pushView(IngredientEdit);
 			}
 			private function doSelect():void {
-				model.diaryColumn['dwhat'] = ingredientsList.selectedItem.ingname;
-				model.unitColumn['fkunitname'] = ingredientsList.selectedItem.fkunitname;
-				model.ingredientColumn['unitkcal'] = ingredientsList.selectedItem.unitkcal;
+				diary.dwhat = ingredientsList.selectedItem.ingname;
+				ingredients.fkunitname = ingredientsList.selectedItem.fkunitname;
+				ingredients.unitkcal = ingredientsList.selectedItem.unitkcal;
 				navigator.popView();
 			}
 			private function doDelete():void {
 				var obj:Object = new Object();
 				obj["@id_ingredient"] = ingredientsList.selectedItem.id;
-				model.getIngredients().Delete(obj);
-				navigator.pushView(Ingredients);
+				ingredients.Delete(obj);
+				navigator.pushView(IngredientsView);
 			}
 			protected function dropdownList_chengeHandler(event:Event):void
 			{
-				//trace(categorySpinner.selectedItem.catname);
-				var obj:Object = new Object();
-				obj["@catfilter"] = categorySpinner.selectedItem.catname;
-				model.getIngredients().selectByCategory(obj, new Responder(onSelected));
+				if(categorySpinner.selectedItem.catname == "All"){
+					ingredients.selectItems(new Responder(onSelected));
+				}else{
+					var obj:Object = new Object();
+					obj["@catfilter"] = categorySpinner.selectedItem.catname;
+					ingredients.selectByCategory(obj, new Responder(onSelected));
+				}
 			}
 			
 		]]>

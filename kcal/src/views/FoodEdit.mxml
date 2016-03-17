@@ -12,6 +12,7 @@
 			import views.scripts.Model;
 			
 			private var connection:SQLConnection;
+			[Bindable]
 			private var model:Model = Model.getInstance();
 			
 			private function init():void{		
@@ -57,10 +58,10 @@
 		</fx:Array>
 	</fx:Declarations>
 	<s:VGroup left="2" top="2">
-		<s:Label styleName="title" text="{model.foodStatus['operation'] + ' F'}"/>
-		<s:HGroup><s:Label text="Greoup name"/><s:TextInput id="t_foodname" text="{model.foodColumn['foodname']}" width="250"/></s:HGroup>
+		<s:Label styleName="title" text="{model.foodStatus['operation'] + ' Food'}"/>
+		<s:HGroup><s:Label text="Food"/><s:TextInput id="t_foodname" text="{model.foodColumn['foodname']}" width="250"/></s:HGroup>
 		<s:HGroup>
-			<s:Button id="b_save" label="Save changes" enabled="false" click="onSave();" />
+			<s:Button id="b_save" label="Save changes" click="onSave();" />
 			<s:Button id="b_clear" label="Clear" click="clearFields();" />
 		</s:HGroup>
 	</s:VGroup>

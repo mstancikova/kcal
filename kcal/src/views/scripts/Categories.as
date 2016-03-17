@@ -6,6 +6,12 @@ package views.scripts
 
 	public class Categories extends Table
 	{
+
+		//current record data
+		[Bindable]
+		public var id:int;
+		[Bindable]
+		public var catname:String;
 		
 		public function Categories(conn:SQLConnection)
 		{

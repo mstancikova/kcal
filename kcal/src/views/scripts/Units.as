@@ -7,6 +7,14 @@ package views.scripts
 	public class Units extends Table
 	{
 
+		//current record data
+		[Bindable]
+		public var id:int;
+		[Bindable]
+		public var unitname:String;
+		[Bindable]
+		public var unitdesc:String;
+		
 		public function Units(conn:SQLConnection)
 		{
 			super(conn);

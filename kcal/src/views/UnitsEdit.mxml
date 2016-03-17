@@ -12,23 +12,25 @@
 			import mx.validators.Validator;
 			
 			import views.scripts.Model;
+			import views.scripts.Units;
 			
 			private var connection:SQLConnection;
-			private var model:Model = Model.getInstance();
+			[Bindable]
+			private var units:views.scripts.Units = Model.getInstance().getUnits();
 		
 			//------------------------------------------------------------------------
 			private function onSave():void {
 				if(fieldsCheck()){				
 					var obj:Object = new Object();
-					if(model.unitStatus['operation'] == 'New'){
+					if(units.status.operation == 'New'){
 						obj["@unitname"] = t_unitname.text;
 						obj["@unitdesc"] = t_unitdesc.text;
-						model.getUnits().Create(obj, new Responder(fatto));
+						units.Create(obj, new Responder(fatto));
 					}else{
-						obj["@id_unit"] = model.unitColumn['id'];
+						obj["@id_unit"] = units.id;
 						obj["@unitname"] = t_unitname.text;
 						obj["@unitdesc"] = t_unitdesc.text;
-						model.getUnits().Update(obj, new Responder(fatto));
+						units.Update(obj, new Responder(fatto));
 					}
 				}
 			}
@@ -37,9 +39,9 @@
 			}
 			private function fatto(evt:SQLResult):void{
 				navigator.popView();
-				model.unitColumn['id'] = "";
-				model.unitColumn['fkunitname'] = "";
-				model.unitColumn['unitdesc'] = "";
+				units.id = -1;
+				units.unitname = "";
+				units.unitdesc = "";
 			}
 			private function clearFields():void {
 				t_unitname.text = t_unitdesc.text = "";
@@ -62,9 +64,9 @@
 		</fx:Array>
 	</fx:Declarations>
 	<s:VGroup left="2" top="2">
-		<s:Label styleName="title" text="{model.unitStatus['operation'] + ' Unit'}"/>
-		<s:HGroup><s:Label text="Name"/><s:TextInput id="t_unitname" text="{model.unitColumn['fkunitname']}" change="onChange()" width="250"/></s:HGroup>
-		<s:HGroup><s:Label text="Description"/><s:TextInput id="t_unitdesc" text="{model.unitColumn['unitdesc']}" change="onChange()" width="250"/></s:HGroup>
+		<s:Label styleName="title" text="{units.status.operation + ' Unit'}"/>
+		<s:HGroup><s:Label text="Name"/><s:TextInput id="t_unitname" text="{units.unitname}" change="onChange()" width="250"/></s:HGroup>
+		<s:HGroup><s:Label text="Description"/><s:TextInput id="t_unitdesc" text="{units.unitdesc}" change="onChange()" width="250"/></s:HGroup>
 		<s:HGroup>
 			<s:Button x="2" id="b_save" label="Save changes" enabled="false" click="onSave();" />
 			<s:Button id="b_clear" label="Clear" click="clearFields();" />

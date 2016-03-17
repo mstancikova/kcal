@@ -8,6 +8,21 @@ package views.scripts
 	public class Diary extends Table
 	{
 		
+		//current record data
+		[Bindable]
+		public var id:int;
+		[Bindable]
+		public var ddate:String;
+		[Bindable]
+		public var dwhat:String;
+		[Bindable]
+		public var iunitkcal:Number;
+		[Bindable]
+		public var dquantity:String;
+		[Bindable]
+		public var dsumm:Number;
+		[Bindable]
+		public var dnote:String;
 		
 		public function Diary(conn:SQLConnection)
 		{

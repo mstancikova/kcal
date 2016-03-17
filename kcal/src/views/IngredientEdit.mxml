@@ -2,39 +2,44 @@
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark"
 		xmlns:mx="library://ns.adobe.com/flex/mx"
-		title="Ingredients" creationComplete="init();">
+		title="Ingredients">
 	<fx:Script>
 		<![CDATA[
 			import flash.data.SQLConnection;
 			import flash.data.SQLResult;
-			import flash.net.Responder;	
+			import flash.net.Responder;
+			
 			import mx.validators.Validator;
+			
+			import views.scripts.Ingredients;
 			import views.scripts.Model;
 			
 			private var connection:SQLConnection;
-			private var model:Model = Model.getInstance();
-			
-			private function init():void{		
-				model = Model.getInstance();
-			}
+			[Bindable]
+			private var ingredients:views.scripts.Ingredients = Model.getInstance().getIngredients();
+			[Bindable]
+			private var category:views.scripts.Categories = Model.getInstance().getCategories();
+			[Bindable]
+			private var units:views.scripts.Units = Model.getInstance().getUnits();
+		
 			
 			//-----------------------------------------------------------------
 			private function onSave():void {
 				if(fieldsCheck()){				
 					var obj:Object = new Object();
-					if(model.ingredientStatus['operation'] == 'New'){
+					if(ingredients.status.operation == 'New'){
 						obj["@ingname"] = t_ingname.text;
 						obj["@fkcatname"] = t_fkcatname.text;
 						obj["@fkunitname"] = t_fkunitname.text;
 						obj["@unitkcal"] = t_unitkcal.text;
-						model.getIngredients().Create(obj, new Responder(fatto));
+						ingredients.Create(obj, new Responder(fatto));
 					}else{
-						obj["@id_ingredient"] = model.ingredientColumn['id'];
+						obj["@id_ingredient"] = ingredients.id;
 						obj["@ingname"] = t_ingname.text;
 						obj["@fkcatname"] = t_fkcatname.text;
 						obj["@fkunitname"] = t_fkunitname.text;
 						obj["@unitkcal"] = t_unitkcal.text;
-						model.getIngredients().Update(obj, new Responder(fatto));
+						ingredients.Update(obj, new Responder(fatto));
 					}
 				}
 			}
@@ -54,16 +59,10 @@
 				}
 			}
 			private function selectCategory(event:FocusEvent):void{
-				model.ingredientColumn['ingname'] = t_ingname.text;
-				model.unitColumn['fkunitname'] = t_fkunitname.text;
-				model.ingredientColumn['unitkcal'] = t_unitkcal.text;
-				navigator.pushView(Categories);
+				navigator.pushView(CategoriesView);
 			}
 			private function selectUnit(event:FocusEvent):void{
-				model.categoryColumn['fkcatname'] = t_fkcatname;
-				model.ingredientColumn['ingname'] = t_ingname.text;
-				model.ingredientColumn['unitkcal'] = t_unitkcal.text;
-				navigator.pushView(Units);
+				navigator.pushView(UnitsView);
 			}
 
 		]]>
@@ -77,11 +76,11 @@
 		</fx:Array>
 	</fx:Declarations>
 	<s:VGroup left="2" top="2">
-		<s:Label styleName="title" text="{model.ingredientStatus['operation'] + ' Ingredient'}"/>
-		<s:HGroup><s:Label text="Category"/><s:TextInput id="t_fkcatname" text="{model.categoryColumn['fkcatname']}" focusIn="selectCategory(event)" width="250"/></s:HGroup>
-		<s:HGroup><s:Label text="Name"/><s:TextInput id="t_ingname" text="{model.ingredientColumn['ingname']}" width="250"/></s:HGroup>
-		<s:HGroup><s:Label text="Unit"/><s:TextInput id="t_fkunitname" text="{model.unitColumn['fkunitname']}" focusIn="selectUnit(event)" width="50"/></s:HGroup>
-		<s:HGroup><s:Label text="Kcal/Unit"/><s:TextInput id="t_unitkcal" text="{model.ingredientColumn['unitkcal']}" width="100"/></s:HGroup>
+		<s:Label styleName="title" text="{ingredients.status.operation + ' Ingredient'}"/>
+		<s:HGroup><s:Label text="Category"/><s:TextInput id="t_fkcatname" text="@{ingredients.fkcatname}" focusIn="selectCategory(event)" width="250"/></s:HGroup>
+		<s:HGroup><s:Label text="Name"/><s:TextInput id="t_ingname" text="@{ingredients.ingname}" width="250"/></s:HGroup>
+		<s:HGroup><s:Label text="Unit"/><s:TextInput id="t_fkunitname" text="@{ingredients.fkunitname}" focusIn="selectUnit(event)" width="50"/></s:HGroup>
+		<s:HGroup><s:Label text="Kcal/Unit"/><s:TextInput id="t_unitkcal" text="@{ingredients.unitkcal}" width="100"/></s:HGroup>
 		<s:HGroup>
 			<s:Button id="b_save" label="Save changes" click="onSave();" />
 			<s:Button id="b_clear" label="Clear" click="clearFields();" />
