@@ -7,7 +7,6 @@
 		<![CDATA[
 			import flash.data.SQLConnection;
 			import flash.data.SQLResult;
-			import flash.net.Responder;
 			
 			import mx.validators.Validator;
 			
@@ -20,18 +19,9 @@
 		
 			//------------------------------------------------------------------------
 			private function onSave():void {
-				if(fieldsCheck()){				
-					var obj:Object = new Object();
-					if(units.status.operation == 'New'){
-						obj["@unitname"] = t_unitname.text;
-						obj["@unitdesc"] = t_unitdesc.text;
-						units.Create(obj, new Responder(fatto));
-					}else{
-						obj["@id_unit"] = units.id;
-						obj["@unitname"] = t_unitname.text;
-						obj["@unitdesc"] = t_unitdesc.text;
-						units.Update(obj, new Responder(fatto));
-					}
+				if(fieldsCheck()){	
+					units.saveItem();
+					navigator.popView();
 				}
 			}
 			private function onChange():void {
@@ -39,9 +29,6 @@
 			}
 			private function fatto(evt:SQLResult):void{
 				navigator.popView();
-				units.id = -1;
-				units.unitname = "";
-				units.unitdesc = "";
 			}
 			private function clearFields():void {
 				t_unitname.text = t_unitdesc.text = "";
@@ -65,8 +52,8 @@
 	</fx:Declarations>
 	<s:VGroup left="2" top="2">
 		<s:Label styleName="title" text="{units.status.operation + ' Unit'}"/>
-		<s:HGroup><s:Label text="Name"/><s:TextInput id="t_unitname" text="{units.unitname}" change="onChange()" width="250"/></s:HGroup>
-		<s:HGroup><s:Label text="Description"/><s:TextInput id="t_unitdesc" text="{units.unitdesc}" change="onChange()" width="250"/></s:HGroup>
+		<s:HGroup><s:Label text="Name"/><s:TextInput id="t_unitname" text="@{units.unitname}" change="onChange()" width="250"/></s:HGroup>
+		<s:HGroup><s:Label text="Description"/><s:TextInput id="t_unitdesc" text="@{units.unitdesc}" change="onChange()" width="250"/></s:HGroup>
 		<s:HGroup>
 			<s:Button x="2" id="b_save" label="Save changes" enabled="false" click="onSave();" />
 			<s:Button id="b_clear" label="Clear" click="clearFields();" />

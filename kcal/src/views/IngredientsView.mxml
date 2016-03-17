@@ -8,7 +8,6 @@
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
-			import flash.data.SQLConnection;
 			import flash.data.SQLResult;
 			import flash.net.Responder;
 			
@@ -18,7 +17,6 @@
 			import views.scripts.Ingredients;
 			import views.scripts.Model;
 			
-			private var connection:SQLConnection;
 			[Bindable]
 			private var ingredients:views.scripts.Ingredients = Model.getInstance().getIngredients();
 			[Bindable]
@@ -63,30 +61,22 @@
 				return evt.catname;
 			}
 			private function doNew():void {
-				ingredients.status.operation = "New";
+				ingredients.newItem();
 				navigator.pushView(IngredientEdit);
 			}
 			private function doEdit():void {
-				ingredients.status.operation = "Edit";
-				ingredients.id = ingredientsList.selectedItem.id;
-				ingredients.ingname = ingredientsList.selectedItem.ingname;
-				ingredients.fkcatname = ingredientsList.selectedItem.fkcatname;
-				ingredients.fkunitname = ingredientsList.selectedItem.fkunitname;
-				ingredients.unitkcal = ingredientsList.selectedItem.unitkcal;
+				ingredients.editItem(ingredientsList.selectedItem);
 				navigator.pushView(IngredientEdit);
 			}
 			private function doSelect():void {
-				ingredients.status.operation = "Selected";
-				diary.dwhat = ingredientsList.selectedItem.ingname;
-				ingredients.fkunitname = ingredientsList.selectedItem.fkunitname;
-				ingredients.unitkcal = ingredientsList.selectedItem.unitkcal;
+				ingredients.status.targetTable["dwhat"] = ingredientsList.selectedItem.ingname;
+				ingredients.status.targetTable["iunitkcal"] = ingredientsList.selectedItem.unitkcal;
+				ingredients.status.targetTable["unitname"] = ingredientsList.selectedItem.fkunitname;
 				navigator.popView();
 			}
 			private function doDelete():void {
-				var obj:Object = new Object();
-				obj["@id_ingredient"] = ingredientsList.selectedItem.id;
-				ingredients.Delete(obj);
-				navigator.pushView(IngredientsView);
+				ingredients.deleteItem(ingredientsList.selectedItem);
+				selectItems();
 			}
 			protected function dropdownList_chengeHandler(event:Event):void
 			{

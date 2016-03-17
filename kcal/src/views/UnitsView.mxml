@@ -8,7 +8,6 @@
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
-			import flash.data.SQLConnection;
 			import flash.data.SQLResult;
 			import flash.net.Responder;
 			
@@ -17,11 +16,8 @@
 
 			import views.scripts.Model;
 			
-			private var connection:SQLConnection;
 			[Bindable]
 			private var units:views.scripts.Units = Model.getInstance().getUnits();
-			[Bindable]
-			private var ingredients:views.scripts.Ingredients = Model.getInstance().getIngredients();
 			
 			[Bindable]
 			private var listData:ArrayCollection;
@@ -42,28 +38,20 @@
 			}
 			
 			private function doNew():void {
-				units.status.operation = "New";
-				units.unitname = "";
-				units.unitdesc = "";
+				units.newItem();
 				navigator.pushView(UnitsEdit);
 			}
 			private function doEdit():void {
-				units.status.operation = "Edit";
-				units.id = unitsList.selectedItem.id;
-				units.unitname = unitsList.selectedItem.unitname;
-				units.unitdesc = unitsList.selectedItem.unitdesc;
+				units.editItem(unitsList.selectedItem);
 				navigator.pushView(UnitsEdit);
 			}
 			private function doSelect():void {
-				units.status.operation = "Selected";
-				ingredients.fkunitname = unitsList.selectedItem.unitname;
+				units.status.targetTable["fkunitname"] = unitsList.selectedItem.unitname;
 				navigator.popView();
 			}
 			private function doDelete():void {
-				var obj:Object = new Object();
-				obj["@id_unit"] = unitsList.selectedItem.id;
-				units.Delete(obj);
-				navigator.pushView(UnitsView);
+				units.deleteItem(unitsList.selectedItem);
+				selectItems();
 			}
 		]]>
 	</fx:Script>

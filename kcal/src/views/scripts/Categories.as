@@ -29,35 +29,42 @@ package views.scripts
 			stat.text = "SELECT * FROM CATEGORY ORDER BY id";
 			stat.execute(-1, rowsResponder);
 		}
-				
-		public function Create(what:Object, createResponder:Responder):void {
-			var stat:SQLStatement = new SQLStatement();
-			stat.sqlConnection = connection;
-			for(var i:Object in what){
-				stat.parameters[i] = what[i];
-			}
-			stat.text = "INSERT INTO CATEGORY (catname) VALUES (@catname)";
-			stat.execute(-1, createResponder);
+		
+		public function newItem():void
+		{
+			id = -1;
+			catname = "";
+			status.operation = "New";
 		}
 		
-		public function Update(what:Object, updatedResponder:Responder):void {
-				var stat:SQLStatement = new SQLStatement();
-				stat.sqlConnection = connection;
-				for(var i:Object in what){
-					stat.parameters[i] = what[i];
-				}
+		public function editItem(item:Object):void
+		{
+			id = item.id;
+			catname = item.catname;
+			status.operation = "Edit";
+		}
+		
+		public function saveItem():void
+		{
+			var stat:SQLStatement = new SQLStatement();
+			stat.sqlConnection = connection;
+			stat.parameters["@catname"] = catname;
+			if(id == -1){
+				stat.text = "INSERT INTO CATEGORY (catname) VALUES (@catname)";
+			}else{
+				stat.parameters["@id_category"] = id;
 				stat.text = "UPDATE CATEGORY SET catname=@catname WHERE id=@id_category";
-				stat.execute(-1, updatedResponder);
+			}
+			stat.execute();
 		}
 		
-		public function Delete(what:Object):void{
+		public function deleteItem(item:Object):void
+		{
 			var stat:SQLStatement = new SQLStatement();
 			stat.sqlConnection = connection;
-			for(var i:Object in what){
-				stat.parameters[i] = what[i];
-			}
+			stat.parameters["@id_category"] = item.id;
 			stat.text = "DELETE FROM CATEGORY WHERE id=@id_category";
-			stat.execute();
+			stat.execute();	
 		}
 	}
 }

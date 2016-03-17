@@ -6,7 +6,8 @@ package views.scripts
 	public class Status extends EventDispatcher
 	{
 		[Bindable]
-		public var  operation:String;
+		public var operation:String;
+		public var targetTable:Table;
 		
 		public function Status(target:IEventDispatcher=null)
 		{

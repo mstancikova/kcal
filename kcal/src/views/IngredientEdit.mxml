@@ -25,26 +25,10 @@
 			
 			//-----------------------------------------------------------------
 			private function onSave():void {
-				if(fieldsCheck()){				
-					var obj:Object = new Object();
-					if(ingredients.status.operation == 'New'){
-						obj["@ingname"] = t_ingname.text;
-						obj["@fkcatname"] = t_fkcatname.text;
-						obj["@fkunitname"] = t_fkunitname.text;
-						obj["@unitkcal"] = t_unitkcal.text;
-						ingredients.Create(obj, new Responder(fatto));
-					}else{
-						obj["@id_ingredient"] = ingredients.id;
-						obj["@ingname"] = t_ingname.text;
-						obj["@fkcatname"] = t_fkcatname.text;
-						obj["@fkunitname"] = t_fkunitname.text;
-						obj["@unitkcal"] = t_unitkcal.text;
-						ingredients.Update(obj, new Responder(fatto));
-					}
+				if(fieldsCheck()){			
+					ingredients.saveItem();
+					navigator.popView();
 				}
-			}
-			private function fatto(evt:SQLResult):void{
-				navigator.popView();
 			}
 			private function clearFields():void {
 				t_ingname.text = t_fkcatname.text = t_fkunitname.text = t_unitkcal.text = "";
@@ -59,9 +43,11 @@
 				}
 			}
 			private function selectCategory(event:FocusEvent):void{
+				category.status.targetTable = ingredients;
 				navigator.pushView(CategoriesView);
 			}
 			private function selectUnit(event:FocusEvent):void{
+				units.status.targetTable = ingredients;
 				navigator.pushView(UnitsView);
 			}
 

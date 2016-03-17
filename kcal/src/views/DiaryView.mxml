@@ -6,7 +6,6 @@
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
-			import flash.data.SQLConnection;
 			import flash.data.SQLResult;
 			import flash.net.Responder;
 			
@@ -16,7 +15,7 @@
 			import views.scripts.Diary;
 			import views.scripts.Model;
 			
-			private var connection:SQLConnection;
+			[Bindable]
 			private var diary:views.scripts.Diary = Model.getInstance().getDiary();
 			
 			[Bindable]
@@ -40,26 +39,17 @@
 			private function getFullName(evt:Object):String{
 				return evt.dwhat +" (" + evt.dsumm +")";
 			}
-			
 			private function doNew():void {
-				diary.status.operation = "New";
+				diary.newItem();
 				navigator.pushView(DiaryEdit);
 			}
 			private function doEdit():void {
-				diary.status.operation = "Edit";
-				diary.id = dayList.selectedItem.id;
-				diary.dwhat = dayList.selectedItem.dwhat;
-				diary.iunitkcal = Number(dayList.selectedItem.iunitkcal);
-				diary.dquantity = dayList.selectedItem.dquantity;
-				diary.dsumm = dayList.selectedItem.dsumm;
-				diary.dnote = dayList.selectedItem.dnote;
+				diary.editItem(dayList.selectedItem);
 				navigator.pushView(DiaryEdit);
 			}
 			private function doDelete():void {
-				var obj:Object = new Object();
-				obj["@id_diary"] = dayList.selectedItem.id;
-				diary.Delete(obj);
-				navigator.pushView(DiaryView);
+				diary.deleteItem(dayList.selectedItem);
+				selectItems();
 			}
 		]]>
 	</fx:Script>

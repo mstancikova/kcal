@@ -25,22 +25,10 @@
 			
 			//------------------------------------------------------------------------	
 			private function onSave():void {
-				if(fieldsCheck()){				
-					var obj:Object = new Object();
-					if(category.status.operation == 'New'){
-						obj["@catname"] = t_catname.text;
-						category.Create(obj, new Responder(fatto));
-					}else{
-						obj["@id_category"] = category.id;
-						obj["@catname"] = t_catname.text;
-						category.Update(obj, new Responder(fatto));
-					}
+				if(fieldsCheck()){
+					category.saveItem();
+					navigator.popView();
 				}
-			}
-			private function fatto(evt:SQLResult):void{
-				navigator.pushView(CategoriesView);
-				category.id = -1;
-				category.catname = "";
 			}
 			private function clearFields():void {
 				t_catname.text = "";
@@ -69,7 +57,7 @@
 	</fx:Declarations>
 	<s:VGroup left="2" top="2"> 
 		<s:Label styleName="title" text="{category.status.operation + ' Category'}"/>
-		<s:HGroup><s:Label text="Name"/><s:TextInput id="t_catname" text="{category.catname}" width="250" change="onChangeHandler(event)"/></s:HGroup>
+		<s:HGroup><s:Label text="Name"/><s:TextInput id="t_catname" text="@{category.catname}" width="250" change="onChangeHandler(event)"/></s:HGroup>
 		<s:HGroup>
 			<s:Button id="b_save" label="Save changes" enabled="false" click="onSave();" />
 			<s:Button id="b_clear" label="Clear" click="clearFields();" />

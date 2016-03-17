@@ -22,8 +22,6 @@
 			 
 			  [Bindable]
 			  private var category:views.scripts.Categories = Model.getInstance().getCategories();
-			  [Bindable]
-			  private var ingredients:views.scripts.Ingredients = Model.getInstance().getIngredients();
 			  
 			  [Bindable]
 			  private var listData:ArrayCollection;
@@ -43,29 +41,22 @@
 				  return evt.catname;
 			  }
 			  private function doNew():void {
-				  category.status["operation"] = "New";
-				  category.catname = "";
+				  category.newItem();
 				  navigator.pushView(CategoriesEdit);
 			  }
 			  private function doEdit():void {
-				  category.status["operation"] = "Edit";
-				  category.id = categoriesList.selectedItem.id;
-				  category.catname = categoriesList.selectedItem.catname;
+				  category.editItem(categoriesList.selectedItem);
 				  navigator.pushView(CategoriesEdit);
 			  }
 			  private function doSelect():void {
-				  category.status.operation = "Selected";
-				  ingredients.fkcatname = categoriesList.selectedItem.catname;
+				  category.status.targetTable["fkcatname"] = categoriesList.selectedItem.catname;
 				  navigator.popView();
 			  }
 			  private function doDelete():void {
-				  var obj:Object = new Object();
-				  obj["@id_category"] = categoriesList.selectedItem.id;
-				  category.Delete(obj);
-				  navigator.pushView(CategoriesView);
+				  category.deleteItem(categoriesList.selectedItem);
+				  selectItems();
 			  }
-			  
-			  
+		  
 		  ]]>
 	  </fx:Script>
 	<s:VGroup left="2" top="2">
