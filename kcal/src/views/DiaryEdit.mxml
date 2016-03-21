@@ -38,7 +38,7 @@
 				var validatorErrors:Array = Validator.validateAll(nameValidators);
 				if (validatorErrors.length > 0) {
 					trace("You have to fill name and description field!", "Oops!");
-					return false;
+					return false; 
 				}else{
 					return true;
 				}
