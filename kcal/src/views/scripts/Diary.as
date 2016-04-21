@@ -15,9 +15,9 @@ package views.scripts
 		[Bindable]
 		public var ddate:Date;
 		[Bindable]
-		public var dwhat:String;
+		public var ingredient:String;
 		
-		private var _iunitkcal:String;
+		private var _unitkcal:String;
 		private var _dquantity:String;
 		
 		[Bindable]
@@ -37,19 +37,19 @@ package views.scripts
 			
 			var stat:SQLStatement = new SQLStatement();
 			stat.sqlConnection = connection;
-			stat.text = "CREATE TABLE IF NOT EXISTS DIARY (id INTEGER PRIMARY KEY AUTOINCREMENT, ddate TEXT, dwhat TEXT, iunitkcal DECIMAL(5, 2), dquantity DECIMAL(5, 2), dsumm DECIMAL(5, 2), dnote TEXT)";
+			stat.text = "CREATE TABLE IF NOT EXISTS DIARY (id INTEGER PRIMARY KEY AUTOINCREMENT, ddate TEXT, ingredient TEXT, unitkcal DECIMAL(5, 2), dquantity DECIMAL(5, 2), dsumm DECIMAL(5, 2), dnote TEXT)";
 			stat.execute();
 		}
 		
 		[Bindable]
-		public function get iunitkcal():String
+		public function get unitkcal():String
 		{
-			return _iunitkcal;
+			return _unitkcal;
 		}
 
-		public function set iunitkcal(value:String):void
+		public function set unitkcal(value:String):void
 		{
-			_iunitkcal = value;
+			_unitkcal = value;
 			updateSumm();
 		}
 
@@ -66,7 +66,7 @@ package views.scripts
 		}
 		
 		private function updateSumm():void{
-			dsumm = String(Number(_dquantity)*Number(_iunitkcal));	
+			dsumm = String(Number(_dquantity)*Number(_unitkcal));	
 		}
 
 		public function selectItems(rowsResponder:Responder, summResponder:Responder):void{
@@ -85,8 +85,8 @@ package views.scripts
 		{
 			id = -1;
 			ddate = new Date();
-			dwhat = "";
-			iunitkcal = "0";
+			ingredient = "";
+			unitkcal = "0";
 			dquantity = "0";
 			dsumm = "0";
 			dnote = "";
@@ -97,8 +97,8 @@ package views.scripts
 		{
 			id = item.id;
 			ddate = new Date(item.ddate);
-			dwhat = item.dwhat;
-			iunitkcal = item.iunitkcal;
+			ingredient = item.dwhat;
+			unitkcal = item.unitkcal;
 			dquantity = item.dquantity;
 			dsumm = item.dsumm;
 			dnote = item.dnote;
@@ -110,16 +110,16 @@ package views.scripts
 			var stat:SQLStatement = new SQLStatement();
 			stat.sqlConnection = connection;
 			stat.parameters["@ddate"] = Functions.getDateFormated(ddate);
-			stat.parameters["@dwhat"] = dwhat;
-			stat.parameters["@iunitkcal"] = iunitkcal;
+			stat.parameters["@ingredient"] = ingredient;
+			stat.parameters["@unitkcal"] = unitkcal;
 			stat.parameters["@dquantity"] = dquantity;
 			stat.parameters["@dsumm"] = dsumm;
 			stat.parameters["@dnote"] = dnote;
 			if(id == -1){
-				stat.text = "INSERT INTO DIARY (ddate, dwhat, iunitkcal, dquantity, dsumm, dnote) VALUES (@ddate, @dwhat, @iunitkcal, @dquantity, @dsumm, @dnote)";
+				stat.text = "INSERT INTO DIARY (ddate, ingredient, unitkcal, dquantity, dsumm, dnote) VALUES (@ddate, @ingredient, @unitkcal, @dquantity, @dsumm, @dnote)";
 			}else{
 				stat.parameters["@id_diary"] = id;
-				stat.text = "UPDATE DIARY SET ddate=@ddate, dwhat=@dwhat, iunitkcal=@iunitkcal, dquantity=@dquantity, dsumm=@dsumm, dnote=@dnote WHERE id=@id_diary";
+				stat.text = "UPDATE DIARY SET ddate=@ddate, ingredient=@ingredient, unitkcal=@unitkcal, dquantity=@dquantity, dsumm=@dsumm, dnote=@dnote WHERE id=@id_diary";
 			}
 			stat.execute();
 		}

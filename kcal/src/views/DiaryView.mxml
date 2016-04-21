@@ -37,7 +37,7 @@
 				listData = new ArrayCollection(evt.data);
 			}
 			private function getFullName(evt:Object):String{
-				return evt.dwhat +" (" + evt.dsumm +")";
+				return evt.ingredient +" (" + evt.dsumm +")";
 			}
 			private function doNew():void {
 				diary.newItem();
@@ -54,11 +54,13 @@
 		]]>
 	</fx:Script>
 	
-	<s:VGroup top="5">	
+	<s:VGroup top="5" left="2">	
 		<s:HGroup>
 			<s:Label text="Total kcal"/><s:TextInput id="t_daysumm" width="100"/>
 		</s:HGroup>
-		<s:List id="dayList" width="310" height="360" x="10" fontSize="9" dataProvider="{listData}" labelFunction="getFullName" click="mx.core.FlexGlobals.topLevelApplication.viewMenuOpen=true;"/>
+		<s:List id="dayList" width="316" height="370" x="10" fontSize="9" 
+				dataProvider="{listData}" labelFunction="getFullName" 
+				click="mx.core.FlexGlobals.topLevelApplication.viewMenuOpen=true;"/>
 	</s:VGroup>
 
 	<s:viewMenuItems>

@@ -55,7 +55,7 @@
 		<s:HGroup><s:Label text="Name"/><s:TextInput id="t_unitname" text="@{units.unitname}" change="onChange()" width="250"/></s:HGroup>
 		<s:HGroup><s:Label text="Description"/><s:TextInput id="t_unitdesc" text="@{units.unitdesc}" change="onChange()" width="250"/></s:HGroup>
 		<s:HGroup>
-			<s:Button x="2" id="b_save" label="Save changes" enabled="false" click="onSave();" />
+			<s:Button x="2" id="b_save" label="Save" enabled="false" click="onSave();" />
 			<s:Button id="b_clear" label="Clear" click="clearFields();" />
 		</s:HGroup>
 	</s:VGroup>

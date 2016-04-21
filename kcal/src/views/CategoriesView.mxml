@@ -2,7 +2,7 @@
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark"
 		xmlns:mx="library://ns.adobe.com/flex/mx"
-		title="Categories"  creationComplete="init();">
+		title="Categories" creationComplete="init();">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
@@ -49,7 +49,8 @@
 				  navigator.pushView(CategoriesEdit);
 			  }
 			  private function doSelect():void {
-				  category.status.targetTable["fkcatname"] = categoriesList.selectedItem.catname;
+				  //mirka category.status.targetTable["fkcatname"] = categoriesList.selectedItem.catname;
+				  category.status.targetTable["fkcatname"] = categoriesList.selectedItem.id;
 				  navigator.popView();
 			  }
 			  private function doDelete():void {
@@ -60,7 +61,7 @@
 		  ]]>
 	  </fx:Script>
 	<s:VGroup left="2" top="2">
-		<s:List width="316" height="360" horizontalCenter="0" verticalCenter="0"
+		<s:List width="316" height="415" horizontalCenter="0" verticalCenter="0"
 				id="categoriesList"
 				dataProvider="{listData}"
 				labelFunction="getFullName"

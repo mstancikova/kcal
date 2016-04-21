@@ -10,22 +10,6 @@ package views.scripts
 		private static var _instance:Model;
 		private var connection:SQLConnection;
 		
-		[Bindable]
-		public var diaryStatus:Object = new Object();
-		[Bindable]
-		public var diaryColumn:Object = new Object();
-		
-		[Bindable]
-		public var foodStatus:Object = new Object();
-		[Bindable]
-		public var foodColumn:Object = new Object();
-		
-		[Bindable]
-		public var foodingredientsStatus:Object = new Object();
-		[Bindable]
-		public var foodingredientsColumn:Object = new Object();
-		
-		
 		private var diary:Diary;
 		private var units:Units;
 		private var categories:Categories;

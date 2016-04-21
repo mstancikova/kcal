@@ -3,6 +3,7 @@ package views.scripts
 	import flash.data.SQLConnection;
 	import flash.data.SQLStatement;
 	import flash.net.Responder;
+	import flash.text.ReturnKeyLabel;
 
 	public class Categories extends Table
 	{
@@ -66,5 +67,6 @@ package views.scripts
 			stat.text = "DELETE FROM CATEGORY WHERE id=@id_category";
 			stat.execute();	
 		}
+		
 	}
 }

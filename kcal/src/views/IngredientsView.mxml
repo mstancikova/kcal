@@ -23,7 +23,7 @@
 			private var category:views.scripts.Categories = Model.getInstance().getCategories();
 			[Bindable]
 			private var diary:views.scripts.Diary = Model.getInstance().getDiary();
-			
+					
 			[Bindable]
 			private var listData:ArrayCollection;
 			[Bindable]
@@ -69,8 +69,8 @@
 				navigator.pushView(IngredientEdit);
 			}
 			private function doSelect():void {
-				ingredients.status.targetTable["dwhat"] = ingredientsList.selectedItem.ingname;
-				ingredients.status.targetTable["iunitkcal"] = ingredientsList.selectedItem.unitkcal;
+				ingredients.status.targetTable["ingredient"] = ingredientsList.selectedItem.ingname;
+				ingredients.status.targetTable["unitkcal"] = ingredientsList.selectedItem.unitkcal;
 				ingredients.status.targetTable["unitname"] = ingredientsList.selectedItem.fkunitname;
 				navigator.popView();
 			}
@@ -96,7 +96,7 @@
 			<s:SpinnerList id="categorySpinner" textAlign="center" width="100%" dataProvider="{listCats}" labelField="catname"
 						   change="dropdownList_chengeHandler(event)"></s:SpinnerList> 
 		</s:SpinnerListContainer>
-		<s:List width="316" height="280" horizontalCenter="0" verticalCenter="0"
+		<s:List width="316" height="290" horizontalCenter="0" verticalCenter="0"
 				id="ingredientsList"
 				dataProvider="{listData}"
 				labelFunction="getFullName"

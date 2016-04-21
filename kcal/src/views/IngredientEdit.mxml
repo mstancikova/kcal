@@ -5,10 +5,7 @@
 		title="Ingredients">
 	<fx:Script>
 		<![CDATA[
-			import flash.data.SQLConnection;
-			import flash.data.SQLResult;
-			import flash.net.Responder;
-			
+			import flash.data.SQLConnection;		
 			import mx.validators.Validator;
 			
 			import views.scripts.Ingredients;
@@ -50,6 +47,7 @@
 				units.status.targetTable = ingredients;
 				navigator.pushView(UnitsView);
 			}
+			
 
 		]]>
 	</fx:Script>
@@ -68,7 +66,7 @@
 		<s:HGroup><s:Label text="Unit"/><s:TextInput id="t_fkunitname" text="@{ingredients.fkunitname}" focusIn="selectUnit(event)" width="50"/></s:HGroup>
 		<s:HGroup><s:Label text="Kcal/Unit"/><s:TextInput id="t_unitkcal" text="@{ingredients.unitkcal}" width="100"/></s:HGroup>
 		<s:HGroup>
-			<s:Button id="b_save" label="Save changes" click="onSave();" />
+			<s:Button id="b_save" label="Save" click="onSave();" />
 			<s:Button id="b_clear" label="Clear" click="clearFields();" />
 		</s:HGroup>
 	</s:VGroup>

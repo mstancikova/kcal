@@ -4,10 +4,7 @@
 		xmlns:mx="library://ns.adobe.com/flex/mx"
 		title="Diary">
 	<fx:Script>
-		<![CDATA[
-			import flash.data.SQLResult;
-			import flash.net.Responder;
-			
+		<![CDATA[		
 			import mx.validators.Validator;
 			
 			import views.scripts.Diary;
@@ -26,13 +23,12 @@
 				}
 			}
 			private function selectIngredient(event:FocusEvent):void{
-				
 				//kam idem a kdo je target
 				ingredients.status.targetTable = diary;
 				navigator.pushView(IngredientsView);
 			}
 			private function clearFields():void {
-				t_dwhat.text = t_iunitkcal.text = t_dquantity.text = t_dsumm.text = t_dnote.text = "";
+				t_ingredient.text = t_unitkcal.text = t_dquantity.text = t_dsumm.text = t_dnote.text = "";
 			}			
 			private function fieldsCheck():Boolean {
 				var validatorErrors:Array = Validator.validateAll(nameValidators);
@@ -50,7 +46,7 @@
 	<fx:Declarations>
 		<fx:Array id="nameValidators">
 			<mx:StringValidator source="{t_ddate}" property="dateItemList" required="true" />
-			<mx:StringValidator source="{t_dwhat}" property="text" required="true" />
+			<mx:StringValidator source="{t_ingredient}" property="text" required="true" />
 			<mx:StringValidator source="{t_dquantity}" property="text" required="true" />
 			<mx:StringValidator source="{t_dsumm}" property="text" required="true" />
 		</fx:Array>
@@ -58,7 +54,7 @@
 	<s:VGroup>	
 		<s:Label styleName="title" text="{diary.status.operation + ' Diary Entry'}"/>
 		<s:HGroup><s:Label text="Date"/><s:DateSpinner id="t_ddate" displayMode="date" locale="it_IT" minuteStepSize="10" selectedDate="@{diary.ddate}"/></s:HGroup>
-		<s:HGroup><s:Label text="What"/><s:TextInput id="t_dwhat" text="@{diary.dwhat}" width="250" focusIn="selectIngredient(event)" /></s:HGroup>
+		<s:HGroup><s:Label text="What"/><s:TextInput id="t_ingredient" text="@{diary.ingredient}" width="250" focusIn="selectIngredient(event)" /></s:HGroup>
 		<s:HGroup>
 			<s:HGroup><s:Label text="Quant."/><s:TextInput id="t_dquantity" text="@{diary.dquantity}" width="100"/></s:HGroup>
 			<s:Label text="{diary.unitname}"/>
@@ -66,11 +62,11 @@
 		<s:HGroup>
 			<s:Label text="Summ"/><s:TextInput id="t_dsumm" text="@{diary.dsumm}" width="100" editable="false"/>
 			<s:Label text=" * " />
-			<s:TextInput id="t_iunitkcal" text="@{diary.iunitkcal}" width="75" editable="false"/>
+			<s:TextInput id="t_unitkcal" text="@{diary.unitkcal}" width="75" editable="false"/>
 		</s:HGroup>
 		<s:HGroup><s:Label text="Note"/><s:TextInput id="t_dnote" text="@{diary.dnote}" width="250"/></s:HGroup>
 		<s:HGroup>
-			<s:Button x="2" id="b_save" label="Save changes" click="onSave();" />
+			<s:Button x="2" id="b_save" label="Save" click="onSave();" />
 			<s:Button id="b_clear" label="Clear" click="clearFields();" />
 		</s:HGroup>
 	</s:VGroup>

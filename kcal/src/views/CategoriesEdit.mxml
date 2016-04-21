@@ -6,8 +6,6 @@
 	<fx:Script>
 		<![CDATA[
 			import flash.data.SQLConnection;
-			import flash.data.SQLResult;
-			import flash.net.Responder;
 			
 			import mx.validators.Validator;
 			
@@ -59,7 +57,7 @@
 		<s:Label styleName="title" text="{category.status.operation + ' Category'}"/>
 		<s:HGroup><s:Label text="Name"/><s:TextInput id="t_catname" text="@{category.catname}" width="250" change="onChangeHandler(event)"/></s:HGroup>
 		<s:HGroup>
-			<s:Button id="b_save" label="Save changes" enabled="false" click="onSave();" />
+			<s:Button id="b_save" label="Save" enabled="false" click="onSave();" />
 			<s:Button id="b_clear" label="Clear" click="clearFields();" />
 		</s:HGroup>
 	</s:VGroup>

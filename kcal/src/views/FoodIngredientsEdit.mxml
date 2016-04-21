@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		xmlns:mx="library://ns.adobe.com/flex/mx"
+		title="Food ingredients Edit">
+	<fx:Script>
+		<![CDATA[
+			import flash.data.SQLConnection;
+			
+			import mx.collections.ArrayCollection;
+			import mx.validators.Validator;
+			
+			import views.scripts.Food;
+			import views.scripts.Foodingredients;
+			import views.scripts.Ingredients;
+			import views.scripts.Model;
+			
+			private var connection:SQLConnection;
+			
+			[Bindable]
+			private var listData:ArrayCollection;
+			
+			[Bindable]
+			private var foodingredients:views.scripts.Foodingredients = Model.getInstance().getFoodingredients();
+			[Bindable]
+			private var food:views.scripts.Food = Model.getInstance().getFood();
+			[Bindable]
+			private var ingredients:views.scripts.Ingredients = Model.getInstance().getIngredients();
+			
+			//------------------------------------------------------------------------
+			
+			private function onSave():void {
+				if(fieldsCheck()){				
+					foodingredients.saveItem();
+					navigator.popView();
+				}
+			}
+			private function selectIngredient(event:FocusEvent):void{
+				ingredients.status.targetTable = foodingredients;
+				navigator.pushView(IngredientsView);
+			}
+			private function clearFields():void {
+				t_fingname.text = t_fquantity.text = t_fkcalsumm.text = "";
+			}			
+			private function fieldsCheck():Boolean {
+				var validatorErrors:Array = Validator.validateAll(nameValidators);
+				if (validatorErrors.length > 0) {
+					trace("You have to fill name and description field!", "Oops!");
+					return false;
+				}else{
+					return true; 
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<fx:Array id="nameValidators">
+			<mx:StringValidator source="{t_fingname}" property="text" required="true" />
+			<mx:StringValidator source="{t_fquantity}" property="text" required="true" />
+			<mx:StringValidator source="{t_fkcalsumm}" property="text" required="true" />
+		</fx:Array>
+	</fx:Declarations>
+	<s:VGroup>
+		<s:Label styleName="title" text="{foodingredients.status.operation + ' Food Item'}"/>
+		<s:HGroup><s:Label text="Ingr."/><s:TextInput id="t_fingname" text="@{foodingredients.ingredient}" width="250" focusIn="selectIngredient(event)" /></s:HGroup>
+		<s:HGroup>
+			<s:Label text="Quant."/><s:TextInput id="t_fquantity" width="100" text="@{foodingredients.fquantity}"/>
+			<s:Label text="{foodingredients.unitname}"/>
+		</s:HGroup>
+		<s:HGroup><s:Label text="Summ"/><s:TextInput id="t_fkcalsumm" text="@{foodingredients.fkcalsumm}" width="100"/> <s:Label text="( kcal/unit: {foodingredients.unitkcal})"/></s:HGroup>
+		<s:HGroup>
+			<s:Button x="2" id="b_save" label="Save changes" click="onSave();" />
+			<s:Button id="b_clear" label="Clear" click="clearFields();" />
+		</s:HGroup>	
+	</s:VGroup>
+</s:View>

@@ -2,62 +2,56 @@
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark"
 		xmlns:mx="library://ns.adobe.com/flex/mx"
-		title="Units" creationComplete="init();">
-	<fx:Declarations>
-		
-	</fx:Declarations>
+		title="Food ingredients list"  creationComplete="selectItems();">
 	<fx:Script>
 		<![CDATA[
-			import flash.data.SQLResult;
-			import flash.net.Responder;
-			
-			import mx.collections.ArrayCollection;
-			import mx.core.FlexGlobals;
-
+			import flash.data.SQLConnection;
+			import mx.collections.ArrayCollection;			
+			import views.scripts.Foodingredients;
 			import views.scripts.Model;
 			
-			[Bindable]
-			private var units:views.scripts.Units = Model.getInstance().getUnits();
+			private var connection:SQLConnection;
 			
 			[Bindable]
 			private var listData:ArrayCollection;
 			
-			private function init():void{		
-				selectItems();
-			}
+			[Bindable]
+			private var foodingredients:views.scripts.Foodingredients = Model.getInstance().getFoodingredients();
+			[Bindable]
+			private var food:views.scripts.Food = Model.getInstance().getFood();
+			
 			private function selectItems():void{
-				units.selectItems(new Responder(onSelected));
+				foodingredients.selectItems(food, new Responder(onSelected));
 			}
 			
-			//-------------------------------------------------------------------------
+			//------------------------------------------------------------------------
+			
 			private function onSelected(evt:SQLResult):void {
 				listData = new ArrayCollection(evt.data);
 			}
 			private function getFullName(evt:Object):String{
-				return evt.unitname+ "    (" + evt.unitdesc+")";
-			}
-			
+				return evt.ingredient + " - Quantity:" + evt.fquantity + " - Kcal:" + evt.fkcalsumm;
+			}	
 			private function doNew():void {
-				units.newItem();
-				navigator.pushView(UnitsEdit);
+				foodingredients.newItem(food);
+				navigator.pushView(FoodIngredientsEdit);
 			}
 			private function doEdit():void {
-				units.editItem(unitsList.selectedItem);
-				navigator.pushView(UnitsEdit);
-			}
-			private function doSelect():void {
-				units.status.targetTable["fkunitname"] = unitsList.selectedItem.unitname;
-				navigator.popView();
+				foodingredients.editItem(foodingredientsList.selectedItem);
+				navigator.pushView(FoodIngredientsEdit);
 			}
 			private function doDelete():void {
-				units.deleteItem(unitsList.selectedItem);
+				foodingredients.deleteItem(foodingredientsList.selectedItem);
 				selectItems();
 			}
+			
 		]]>
 	</fx:Script>
-	<s:VGroup left="2" top="2">
-		<s:List width="316" height="415" horizontalCenter="0" verticalCenter="0"
-				id="unitsList"
+	<fx:Declarations>
+	</fx:Declarations>
+	<s:VGroup>	
+		<s:List width="316" height="210" horizontalCenter="0" verticalCenter="0"
+				id="foodingredientsList"
 				dataProvider="{listData}"
 				labelFunction="getFullName"
 				fontSize="9" click="mx.core.FlexGlobals.topLevelApplication.viewMenuOpen=true;">
@@ -66,12 +60,11 @@
 	
 	<s:viewMenuItems>
 		<s:ViewMenuItem id="b_edit" label="Edit" click="doEdit();"/>
-		<s:ViewMenuItem id="b_select" label="Select" click="doSelect();"/>
 		<s:ViewMenuItem id="b_delete" label="Delete" click="doDelete();"/>
 	</s:viewMenuItems>
 	
 	<s:navigationContent>
-	<s:Button label="&lt;&lt;" click="navigator.popView();"/>
+		<s:Button label="&lt;&lt;" click="navigator.popView();"/>
 	</s:navigationContent>
 	<s:actionContent>
 		<s:Button label="+" click="doNew();"/>

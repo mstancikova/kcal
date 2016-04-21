@@ -11,13 +11,18 @@
 			import flash.data.SQLConnection;
 			import flash.data.SQLResult;
 			import flash.net.Responder;
+			
 			import mx.collections.ArrayCollection;
 			import mx.core.FlexGlobals;
 			
+			import views.scripts.Food;
 			import views.scripts.Model;
 			
 			private var connection:SQLConnection;
-			private var model:Model = Model.getInstance();
+			[Bindable]
+			private var food:views.scripts.Food = Model.getInstance().getFood();
+			[Bindable]
+			private var foodingredients:views.scripts.Foodingredients = Model.getInstance().getFoodingredients();
 			
 			[Bindable]
 			private var listData:ArrayCollection;
@@ -26,7 +31,7 @@
 				selectItems();
 			}
 			private function selectItems():void{
-				model.getFood().selectItems(new Responder(onSelected));
+				food.selectItems(new Responder(onSelected));
 			}
 			
 			//-------------------------------------------------------------------------
@@ -38,34 +43,29 @@
 			}
 			
 			private function doNew():void {
-				model.foodStatus["operation"] = "New";
-				model.foodColumn['foodname'] = "";
+				food.newItem();
 				navigator.pushView(FoodEdit);
 			}
 			private function doEdit():void {
-				model.foodStatus["operation"] = "Edit";
-				model.foodColumn['id'] = foodList.selectedItem.id;
-				model.foodColumn['foodname'] = foodList.selectedItem.foodname;
+				food.editItem(foodList.selectedItem);
 				navigator.pushView(FoodEdit);
 			}
-			private function doAdd():void {
-				model.foodingredientsColumn["fname"] = foodList.selectedItem.foodname;;
-				navigator.pushView(FoodIngredients);
+			private function doEditIngredients():void {
+				food.setItem(foodList.selectedItem);
+				navigator.pushView(FoodIngredientsView);
 			}
 			private function doSelect():void {
-				model.foodColumn['foodname'] = foodList.selectedItem.foodname;
+				food.status.targetTable["foodname"] = foodList.selectedItem.foodname;
 				navigator.popView();
 			}
 			private function doDelete():void {
-				var obj:Object = new Object();
-				obj["@id_food"] = foodList.selectedItem.id;
-				model.getFood().Delete(obj);
-				navigator.pushView(Food);
+				food.deleteItem(foodList.selectedItem);
+				selectItems();
 			}
 		]]>
 	</fx:Script>
-	<s:VGroup left="2" top="2">
-		<s:List width="316" height="360" horizontalCenter="0" verticalCenter="0"
+	<s:VGroup>
+		<s:List width="316" height="415" horizontalCenter="0" verticalCenter="0"
 				id="foodList"
 				dataProvider="{listData}"
 				labelFunction="getFullName"
@@ -75,7 +75,7 @@
 	
 	<s:viewMenuItems>
 		<s:ViewMenuItem id="b_edit" label="Edit" click="doEdit();"/>
-		<s:ViewMenuItem id="b_add" label="Add Ingredients" click="doAdd();"/>
+		<s:ViewMenuItem id="b_add" label="Ingredients List" click="doEditIngredients();"/>
 		<s:ViewMenuItem id="b_select" label="Select" click="doSelect();"/>
 		<s:ViewMenuItem id="b_delete" label="Delete" click="doDelete();"/>
 	</s:viewMenuItems>
